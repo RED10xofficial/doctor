@@ -3,6 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { Info } from 'lucide-react';
+import Image from 'next/image';
 
 type FormData = {
   fullName: string;
@@ -34,10 +35,12 @@ export default function SignupPage() {
       <div className="max-w-4xl mx-auto px-8">
         <div className="bg-white rounded-xl shadow-lg grid grid-cols-2 ">
           <div className="flex items-center justify-center  rounded-l-xl">
-            <img 
+            <Image 
               src="/register.png" 
               alt="Medical Illustration"
               className="w-full max-w-md rounded-lg"
+              width={500}
+              height={500}
             />
           </div>
           

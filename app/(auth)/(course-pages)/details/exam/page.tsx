@@ -442,7 +442,7 @@ export default function ExamPage() {
           </div>
         </div>
       </div>
-      <Popup isOpen={isOpen} setIsOpen={closeExam} title="Exam Instructions">
+      <Popup isOpen={isOpen} setIsOpen={closeExam} title="Exam Instructions" backdrop>
         <ExamInstructions onStart={startTimer} />
       </Popup>
     </>

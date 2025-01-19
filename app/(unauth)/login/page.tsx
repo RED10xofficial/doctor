@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import { useForm } from 'react-hook-form';
+import Image from "next/image";
+import { useForm } from "react-hook-form";
 
 type FormData = {
   email: string;
@@ -24,34 +25,38 @@ export default function LoginPage() {
       <div className="max-w-4xl mx-auto px-8">
         <div className="bg-white rounded-xl shadow-lg grid grid-cols-2">
           <div className="flex items-center justify-center rounded-l-xl">
-            <img 
-              src="/login.png" 
+            <Image
+              src="/login.png"
               alt="Medical Illustration"
               className="w-full max-w-md rounded-lg"
+              width={500}
+              height={500}
             />
           </div>
-          
-          <div className='p-8 bg-sky-50'>
+
+          <div className="p-8 bg-sky-50">
             <h2 className="text-primaryText text-2xl font-semibold mb-6 text-center">
               Login to Your Account
             </h2>
-            
+
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
                 <label className="block text-gray-700 mb-2">Email</label>
                 <input
-                  {...register('email', { 
-                    required: 'Email is required',
+                  {...register("email", {
+                    required: "Email is required",
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Please enter a valid email address'
-                    }
+                      message: "Please enter a valid email address",
+                    },
                   })}
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-sky-400"
                   placeholder="Enter your email"
                 />
                 {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.email.message}
+                  </p>
                 )}
               </div>
 
@@ -59,14 +64,16 @@ export default function LoginPage() {
                 <label className="block text-gray-700 mb-2">Password</label>
                 <input
                   type="password"
-                  {...register('password', { 
-                    required: 'Password is required',
+                  {...register("password", {
+                    required: "Password is required",
                   })}
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-sky-400"
                   placeholder="Enter your password"
                 />
                 {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.password.message}
+                  </p>
                 )}
               </div>
 
@@ -77,7 +84,12 @@ export default function LoginPage() {
                 Login
               </button>
             </form>
-            <a href="/signup" className="text-sky-600 text-sm mt-2 block text-center">Don`t have an account? Sign up</a>
+            <a
+              href="/signup"
+              className="text-sky-600 text-sm mt-2 block text-center"
+            >
+              Don`t have an account? Sign up
+            </a>
           </div>
         </div>
       </div>

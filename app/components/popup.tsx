@@ -1,4 +1,4 @@
-import { DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react";
+import { DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react";
 
 import { Dialog } from "@headlessui/react";
 
@@ -6,14 +6,27 @@ import { Transition } from "@headlessui/react";
 import { X } from "lucide-react";
 import { Fragment } from "react";
 
-export default function Popup({ children, isOpen, setIsOpen, title }: { children: React.ReactNode, isOpen: boolean, setIsOpen: (isOpen: boolean) => void, title: string }) {
-    return (
-        <Transition appear show={isOpen} as={Fragment}>
+export default function Popup({
+  children,
+  isOpen,
+  setIsOpen,
+  title,
+  backdrop = false
+}: {
+  children: React.ReactNode;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  title: string;
+  backdrop?: boolean
+}) {
+  return (
+      <Transition appear show={isOpen} as={Fragment}>
         <Dialog
           as="div"
           className="relative z-10"
           onClose={() => setIsOpen(false)}
         >
+          {backdrop &&  <DialogBackdrop className="fixed inset-0 bg-black/80 backdrop-blur-md" />}
           <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
@@ -47,8 +60,10 @@ export default function Popup({ children, isOpen, setIsOpen, title }: { children
                   {children}
 
                   <div className="mt-4 absolute top-1 right-3">
-                   
-                    <X className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer" onClick={() => setIsOpen(false)} />
+                    <X
+                      className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer"
+                      onClick={() => setIsOpen(false)}
+                    />
                   </div>
                 </DialogPanel>
               </TransitionChild>
@@ -56,5 +71,5 @@ export default function Popup({ children, isOpen, setIsOpen, title }: { children
           </div>
         </Dialog>
       </Transition>
-    );
+  );
 }
