@@ -1,13 +1,13 @@
 // pages/api/auth/[...nextauth].ts
 
-import NextAuth, { Session } from "next-auth";
+import NextAuth, { Session, SessionStrategy } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
 import { JWT } from "next-auth/jwt";
 
-export default NextAuth({
+export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
@@ -34,6 +34,8 @@ export default NextAuth({
           return {
             id: `${user.id}`,
             username: user.email,
+            name: user.name,
+            image: user.image,
             email: user.email,
           };
         } else {
@@ -44,11 +46,11 @@ export default NextAuth({
   ],
 
   session: {
-    strategy: "jwt", // Store session as JWT
+    strategy: "jwt" as SessionStrategy, // Store session as JWT
   },
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user: Session["user"] }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -65,4 +67,6 @@ export default NextAuth({
       return session;
     },
   },
-});
+};
+
+export default NextAuth(authOptions);

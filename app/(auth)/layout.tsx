@@ -1,11 +1,24 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import Navigation from "../components/navigation";
-export default function Layout({ children }: { children: React.ReactNode }) {
+import AuthProvider from "../components/AuthProvider";
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth();
+  if (!session) {
+    redirect("/login");
+  }
   return (
-    <section>
-      <Navigation />
-      <div className="mt-[50px] bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50">
-        {children}
-      </div>
-    </section>
+    <AuthProvider>
+      <section>
+        <Navigation />
+        <div className="mt-[50px] bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50">
+          {children}
+        </div>
+      </section>
+    </AuthProvider>
   );
 }
