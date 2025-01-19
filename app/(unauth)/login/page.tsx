@@ -1,7 +1,10 @@
 "use client";
 
+import { signIn } from "next-auth/react";
+import { redirect } from "next/navigation";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
+import { useSnackbar } from "@/app/components/Snackbar";
 
 type FormData = {
   email: string;
@@ -9,15 +12,24 @@ type FormData = {
 };
 
 export default function LoginPage() {
+  const { showSnackbar } = useSnackbar();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
-    // Handle form submission
+  const onSubmit = async (data: FormData) => {
+    const res = await signIn("credentials", {
+      redirect: false,
+      email: data.email,
+      password: data.password,
+    });
+    if (res?.ok) {
+      redirect("/home");
+    } else {
+      showSnackbar(res?.error || "Something went wrong", "error");
+    }
   };
 
   return (
