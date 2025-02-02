@@ -133,6 +133,8 @@ const CourseDetails = ({
       id: exam.id,
       name: exam.name,
       unitId: exam.unitId,
+      instruction: exam.instruction ?? '',
+      duration: exam.duration ?? 30
     }))
   );
 
