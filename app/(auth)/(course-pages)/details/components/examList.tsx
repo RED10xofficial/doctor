@@ -1,6 +1,7 @@
+import { Exam } from "@prisma/client";
 import Link from "next/link";
 
-export default function ExamList({ exams }: { exams: any[] }) {
+export default function ExamList({ exams }: { exams: Exam[] }) {
   return (
     <div className="mt-2">
       {exams.map((exam) => (
@@ -10,7 +11,7 @@ export default function ExamList({ exams }: { exams: any[] }) {
         >
           <p className="text-gray-600 text-sm">{exam.name}</p>
           <Link
-            href={`/details/exam/`}
+            href={`/details/exam/${exam.id}`}
             className="text-sky-600 text-sm hover:text-sky-800 hover:bg-gray-50 px-2 py-1 rounded-md"
           >
             Start Now
