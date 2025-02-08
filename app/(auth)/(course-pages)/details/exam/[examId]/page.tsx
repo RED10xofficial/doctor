@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import ExamInstructions from "../../components/examInstructions";
 import { redirect, useParams } from "next/navigation";
 import useSWR from "swr";
+import { useSession } from "next-auth/react";
 
 interface Option {
   id: string;
@@ -29,6 +30,7 @@ export default function ExamPage() {
   const [time, setTime] = useState(0);
   const [isOpen, setIsOpen] = useState(true);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+  const session = useSession();
 
   const params = useParams<{ examId: string }>();
   const examId = params?.examId;
@@ -93,6 +95,24 @@ export default function ExamPage() {
     return <div>Error loading exam.</div>;
   }
 
+  const answerQuestion = async (
+    questionId: string,
+    answer: string,
+    optionId: string
+  ) => {
+    await fetch("/api/submit-answer", {
+      method: "POST",
+      body: JSON.stringify({
+        questionId,
+        examId,
+        studentId: session.data?.user.id,
+        answerText: answer,
+        studentAnswer: optionId,
+        score: 1
+      }),
+    });
+  };
+
   return (
     <>
       <div className="flex-1 bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-10 min-h-screen">
@@ -119,7 +139,13 @@ export default function ExamPage() {
                 <p className="text-gray-500">{question.question}</p>
                 <div className="mt-4">
                   {question.options.map((option: Option) => (
-                    <div className="flex items-center mb-3" key={option.id}>
+                    <div
+                      className="flex items-center mb-3"
+                      key={option.id}
+                      onClick={() =>
+                        answerQuestion(question.id, option.text, option.id)
+                      }
+                    >
                       <input
                         type="radio"
                         name={`question-${question.id}`} // Unique name for each question
