@@ -95,9 +95,21 @@ export default function ExamPage() {
     return <div>Error loading exam.</div>;
   }
 
+  const indexToOptionLetter = (index: number) => {
+    const options: { [key: string]: string } = {
+      0: "a",
+      1: "b",
+      2: "c",
+      3: "d",
+      4: "e",
+      5: "f",
+    };
+    return options[`${index}`];
+  };
+
   const answerQuestion = async (
     questionId: string,
-    answer: string,
+    answer: number,
     optionId: string
   ) => {
     await fetch("/api/submit-answer", {
@@ -106,9 +118,9 @@ export default function ExamPage() {
         questionId,
         examId,
         studentId: session.data?.user.id,
-        answerText: answer,
+        answerText: indexToOptionLetter(answer),
         studentAnswer: optionId,
-        score: 1
+        score: 1,
       }),
     });
   };
@@ -138,18 +150,15 @@ export default function ExamPage() {
                 <h2 className="text-lg font-semibold">Question {index + 1}</h2>
                 <p className="text-gray-500">{question.question}</p>
                 <div className="mt-4">
-                  {question.options.map((option: Option) => (
-                    <div
-                      className="flex items-center mb-3"
-                      key={option.id}
-                      onClick={() =>
-                        answerQuestion(question.id, option.text, option.id)
-                      }
-                    >
+                  {question.options.map((option: Option, index: number) => (
+                    <div className="flex items-center mb-3" key={option.id}>
                       <input
                         type="radio"
                         name={`question-${question.id}`} // Unique name for each question
                         id={`option-${option.id}`} // Unique id for each option
+                        onChange={() => {
+                          answerQuestion(question.id, index, option.id);
+                        }}
                       />
                       <label
                         htmlFor={`option-${option.id}`}

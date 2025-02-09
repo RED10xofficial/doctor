@@ -1,4 +1,4 @@
-import { ArrowLeft, CircleX, ReceiptText } from "lucide-react";
+import { ReceiptText } from "lucide-react";
 
 export default function DetailedResultPage() {
     // Mock data - in real app, this would come from your API/database

@@ -62,6 +62,7 @@ export default async function handler(
           select: {
             id: true,
             question: true,
+            answer: true,
             options: {
               select: {
                 id: true,
