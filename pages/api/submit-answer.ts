@@ -1,10 +1,14 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
+import { authMiddleware } from "./middleware";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+
+  await authMiddleware(req, res);
+
   if (req.method === "POST") {
     if (!req.body) {
       return res.status(400).json({ error: "Request body is missing" });

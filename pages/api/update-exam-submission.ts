@@ -1,10 +1,15 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
+import { NextApiRequest, NextApiResponse } from "next";
+import { PrismaClient } from "@prisma/client";
+import { authMiddleware } from "./middleware";
 
 const prisma = new PrismaClient();
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'PUT') {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  await authMiddleware(req, res);
+  if (req.method === "PUT") {
     try {
       const { studentId, examId } = req.body;
 
@@ -17,7 +22,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       if (!examScores || examScores.length === 0) {
-        return res.status(404).json({ error: 'Exam scores not found for the student and exam' });
+        return res
+          .status(404)
+          .json({ error: "Exam scores not found for the student and exam" });
       }
 
       // Update the submitted field for each exam score
@@ -31,12 +38,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
       });
 
-      res.status(200).json({ message: 'Exam submission updated successfully' });
+      res.status(200).json({ message: "Exam submission updated successfully" });
     } catch (error) {
-      console.error('Error updating exam submission:', error);
-      res.status(500).json({ error: 'Failed to update exam submission' });
+      console.error("Error updating exam submission:", error);
+      res.status(500).json({ error: "Failed to update exam submission" });
     }
   } else {
-    res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ error: "Method not allowed" });
   }
 }

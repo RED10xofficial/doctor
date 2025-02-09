@@ -7,11 +7,8 @@ import ExamInstructions from "../../components/examInstructions";
 import { redirect, useParams } from "next/navigation";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
-
-interface Option {
-  id: string;
-  text: string;
-}
+import { useSnackbar } from "@/app/components/Snackbar";
+import {Option}  from '@prisma/client';
 
 interface Question {
   id: string;
@@ -27,6 +24,7 @@ interface Exam {
 }
 
 export default function ExamPage() {
+  const { showSnackbar } = useSnackbar();
   const [time, setTime] = useState(0);
   const [isOpen, setIsOpen] = useState(true);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
@@ -83,6 +81,7 @@ export default function ExamPage() {
   };
 
   const closeExam = () => {
+    submitExam();
     setIsOpen(false);
     redirect("/details");
   };
@@ -95,22 +94,10 @@ export default function ExamPage() {
     return <div>Error loading exam.</div>;
   }
 
-  const indexToOptionLetter = (index: number) => {
-    const options: { [key: string]: string } = {
-      0: "a",
-      1: "b",
-      2: "c",
-      3: "d",
-      4: "e",
-      5: "f",
-    };
-    return options[`${index}`];
-  };
-
   const answerQuestion = async (
     questionId: string,
-    answer: number,
-    optionId: string
+    answer: string,
+    optionId: number
   ) => {
     await fetch("/api/submit-answer", {
       method: "POST",
@@ -118,11 +105,24 @@ export default function ExamPage() {
         questionId,
         examId,
         studentId: session.data?.user.id,
-        answerText: indexToOptionLetter(answer),
+        answerText: answer,
         studentAnswer: optionId,
         score: 1,
       }),
     });
+  };
+
+  const submitExam = async () => {
+    const response = await fetch("/api/update-exam-submission", {
+      method: "PUT",
+      body: JSON.stringify({
+        studentId: session.data?.user.id,
+        examId,
+      }),
+    });
+    if (response.ok) {
+      showSnackbar("Your answers have been submitted", "success");
+    }
   };
 
   return (
@@ -150,14 +150,14 @@ export default function ExamPage() {
                 <h2 className="text-lg font-semibold">Question {index + 1}</h2>
                 <p className="text-gray-500">{question.question}</p>
                 <div className="mt-4">
-                  {question.options.map((option: Option, index: number) => (
+                  {question.options.map((option: Option) => (
                     <div className="flex items-center mb-3" key={option.id}>
                       <input
                         type="radio"
                         name={`question-${question.id}`} // Unique name for each question
                         id={`option-${option.id}`} // Unique id for each option
                         onChange={() => {
-                          answerQuestion(question.id, index, option.id);
+                          answerQuestion(question.id, option.optionKey, option.id);
                         }}
                       />
                       <label
@@ -171,6 +171,15 @@ export default function ExamPage() {
                 </div>
               </div>
             ))}
+          </div>
+          <div>
+            <button
+              type="button"
+              className="w-full bg-sky-400 text-white py-2 px-4 rounded-lg hover:bg-sky-500 transition-colors duration-300"
+              onClick={()=> submitExam()}
+            >
+              Submit
+            </button>
           </div>
         </div>
       </div>
