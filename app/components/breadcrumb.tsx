@@ -8,7 +8,7 @@ export default function Breadcrumb() {
   const pathname = usePathname();
   
   const segments = pathname
-    .split('/')
+    ?.split('/')
     .filter(segment => segment !== '');
 
   return (
@@ -19,7 +19,7 @@ export default function Breadcrumb() {
             <Home className="w-4 h-4" /> Home
           </Link>
         </li>
-        {segments.map((segment, index) => {
+        {segments?.map((segment, index) => {
           const path = `/${segments.slice(0, index + 1).join('/')}`;
           const isLast = index === segments.length - 1;
           
