@@ -10,36 +10,98 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import { AlignRightIcon } from "lucide-react";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useState, useCallback, useEffect } from "react";
 import ExamList from "./components/examList";
 import useSWR from "swr";
 import { fetcher } from "@/lib/utils";
-import { Exam } from "@prisma/client";
+import { Exam, Section } from "@prisma/client";
+import { useRouter, useSearchParams } from "next/navigation";
+
+interface SectionWithUnits extends Section {
+  units: UnitWithExams[];
+}
+
+interface UnitWithExams {
+  id: number;
+  name: string;
+  description: string;
+  content: string;
+  videoUrl: string;
+  duration: number;
+  sectionId: number;
+  exams: Exam[];
+}
+
+interface CourseDetailsProps {
+  sections: SectionWithUnits[] | undefined;
+  setOpenModules: (openModules: boolean) => void;
+  openModules: boolean;
+  currentSectionIndex: number;
+  currentUnitIndex: number;
+}
 
 export default function DetailsPage() {
   const [openModules, setOpenModules] = useState(false);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const [currentUnitIndex, setCurrentUnitIndex] = useState(0);
 
-  const { data: sections, error, isLoading } = useSWR("/api/sections", fetcher);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Read initial section from query params
+  useEffect(() => {
+    const sectionParam = searchParams?.get("currentSection");
+    if (sectionParam) {
+      setCurrentSectionIndex(parseInt(sectionParam));
+    }
+  }, [searchParams]);
+
+  // Use useCallback to memoize the setCurrentIndex function
+  const setCurrentIndex = useCallback(
+    (sectionIndex: number, unitIndex: number) => {
+      setCurrentSectionIndex(sectionIndex);
+      setCurrentUnitIndex(unitIndex);
+      // Update the URL with the new section index
+      if (searchParams) {
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.set("currentSection", sectionIndex.toString());
+        router.push(`?${newParams.toString()}`);
+      }
+    },
+    [router, searchParams]
+  );
+
+  const { data: sections, error, isLoading } = useSWR<SectionWithUnits[]>(
+    "/api/sections",
+    fetcher
+  );
+
+  if (isLoading) {
+    return <div>Loading sections...</div>;
+  }
 
   if (error) {
     return <div>Failed to load sections</div>;
-  }
-  if (isLoading) {
-    return <div>Loading sections...</div>;
   }
 
   return (
     <div className="bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 w-full min-h-screen">
       <div className="flex gap-4 max-w-7xl mx-auto p-2 pt-4">
         <div className="hidden md:block">
-          <Modules sections={sections} />
+          {sections && (
+            <Modules sections={sections} setCurrentIndex={setCurrentIndex} />
+          )}
         </div>
         <div className="flex-1 bg-white rounded-lg p-4">
-          <CourseDetails
-            sections={sections}
-            setOpenModules={setOpenModules}
-            openModules={openModules}
-          />
+          {sections && (
+            <CourseDetails
+              sections={sections}
+              setOpenModules={setOpenModules}
+              openModules={openModules}
+              currentSectionIndex={currentSectionIndex}
+              currentUnitIndex={currentUnitIndex}
+            />
+          )}
         </div>
       </div>
       <Transition appear show={openModules} as={Fragment}>
@@ -77,7 +139,12 @@ export default function DetailsPage() {
                     className="text-lg font-medium leading-6 text-gray-900"
                   ></DialogTitle>
                   <div className="mt-2">
-                    <Modules sections={sections} />
+                    {sections && (
+                      <Modules
+                        sections={sections}
+                        setCurrentIndex={setCurrentIndex}
+                      />
+                    )}
                   </div>
 
                   <div className="mt-4 flex justify-end">
@@ -99,51 +166,25 @@ export default function DetailsPage() {
   );
 }
 
-interface CourseDetailsProps {
-  sections:
-    | {
-        id: number;
-        name: string;
-        units: {
-          id: number;
-          name: string;
-          description: string;
-          content: string;
-          videoUrl: string;
-          duration: number;
-          sectionId: number;
-          exams: Exam[];
-        }[];
-      }[]
-    | undefined;
-  setOpenModules: (openModules: boolean) => void;
-  openModules: boolean;
-}
-
 // Extracted CourseDetails component
-const CourseDetails = ({
-  sections,
-  setOpenModules,
-  openModules,
-}: CourseDetailsProps) => {
+const CourseDetails = (props: CourseDetailsProps) => {
+  const { sections, setOpenModules, openModules, currentSectionIndex, currentUnitIndex } = props;
   const [isOpen, setIsOpen] = useState(false);
-  const currentSection = useRef(0);
-  const exams = sections?.[currentSection.current].units.map((unit) =>
-    unit.exams.map((exam: Exam) => ({
-      id: exam.id,
-      name: exam.name,
-      unitId: exam.unitId,
-      instruction: exam.instruction ?? '',
-      duration: exam.duration ?? 30
-    }))
-  );
+
+  // Directly use the props for currentSectionIndex and currentUnitIndex
+  // No need to use useRef as these are already managed by the parent component's state
+  const currentSection = sections?.[currentSectionIndex];
+  const currentUnit = currentSection?.units?.[currentUnitIndex];
+
+  // Safely access exams using optional chaining
+  const exams = currentUnit?.exams;
 
   return (
     <>
       <div className="flex justify-between items-start">
         <div>
           <h2 className="text-2xl font-bold text-gray-600">
-            {sections?.[currentSection.current].name}
+            {currentUnit?.name}
           </h2>
           <div>
             <div className="flex items-center">
@@ -162,10 +203,7 @@ const CourseDetails = ({
                 />
               </svg>
               <p className="ml-2 text-gray-500 text-sm">
-                Section{" "}
-                {sections && sections?.length > 0
-                  ? sections?.[0]?.id
-                  : "Loading"}
+                {currentSection?.name}
               </p>
             </div>
           </div>
@@ -189,65 +227,15 @@ const CourseDetails = ({
         </div>
       </div>
 
-      <p className="text-gray-500 text-sm mt-4 border-b pb-4">
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Deleniti magni
-        sed voluptatem a, inventore delectus at. Nulla perspiciatis autem modi
-        atque maiores, quo nihil doloremque? Consectetur quo repudiandae ipsam
-        quas!
-      </p>
+      <p className="text-gray-500 text-sm mt-4 border-b pb-4"></p>
       <div className="mt-6">
         <h2 className="text-xl font-semibold text-gray-600">Description</h2>
         <p className="text-gray-500 text-sm mt-2">
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Deleniti
-          magni sed voluptatem a, inventore delectus at. Nulla perspiciatis
-          autem modi atque maiores, quo nihil doloremque? Consectetur quo
-          repudiandae ipsam quas! Sample PDF This is a simple PDF file. Fun fun
-          fun. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
-          Phasellus facilisis odio sed mi. Curabitur suscipit. Nullam vel nisi.
-          Etiam semper ipsum ut lectus. Proin aliquam, erat eget pharetra
-          commodo, eros mi condimentum quam, sed commodo justo quam ut velit.
-          Integer a erat. Cras laoreet ligula cursus enim. Aenean scelerisque
-          velit et tellus. Vestibulum dictum aliquet sem. Nulla facilisi.
-          Vestibulum accumsan ante vitae elit. Nulla erat dolor, blandit in,
-          rutrum quis, semper pulvinar, enim. Nullam varius congue risus.
-          Vivamus sollicitudin, metus ut interdum eleifend, nisi tellus
-          pellentesque elit, tristique accumsan eros quam et risus. Suspendisse
-          libero odio, mattis sit amet, aliquet eget, hendrerit vel, nulla. Sed
-          vitae augue. Aliquam erat volutpat. Aliquam feugiat vulputate nisl.
-          Suspendisse quis nulla pretium ante pretium mollis. Proin velit
-          ligula, sagittis at, egestas a, pulvinar quis, nisl. Pellentesque sit
-          amet lectus. Praesent pulvinar, nunc quis iaculis sagittis, justo quam
-          lobortis tortor, sed vestibulum dui metus venenatis est. Nunc cursus
-          ligula. Nulla facilisi. Phasellus ullamcorper consectetuer ante. Duis
-          tincidunt, urna id condimentum luctus, nibh ante vulputate sapien, id
-          sagittis massa orci ut enim. Pellentesque vestibulum convallis sem.
-          Nulla consequat quam ut nisl. Nullam est. Curabitur tincidunt dapibus
-          lorem. Proin velit turpis, scelerisque sit amet, iaculis nec, rhoncus
-          ac, ipsum. Phasellus lorem arcu, feugiat eu, gravida eu, consequat
-          molestie, ipsum. Nullam vel est ut ipsum volutpat feugiat. Aenean
-          pellentesque. In mauris. Pellentesque dui nisi, iaculis eu, rhoncus
-          in, venenatis ac, ante. Ut odio justo, scelerisque vel, facilisis non,
-          commodo a, pede. Cras nec massa sit amet tortor volutpat varius. Donec
-          lacinia, neque a luctus aliquet, pede massa imperdiet ante, at varius
-          lorem pede sed sapien. Fusce erat nibh, aliquet in, eleifend eget,
-          commodo eget, erat. Fusce consectetuer. Cras risus tortor, porttitor
-          nec, tristique sed, convallis semper, eros. Fusce vulputate ipsum a
-          mauris. Phasellus mollis. Curabitur sed urna. Aliquam nec sapien non
-          nibh pulvinar convallis. Vivamus facilisis augue quis quam. Proin
-          cursus aliquet metus. Suspendisse lacinia. Nulla at tellus ac turpis
-          eleifend scelerisque. Maecenas a pede vitae enim commodo interdum.
-          Donec odio. Sed sollicitudin dui vitae justo. Morbi elit nunc,
-          facilisis a, mollis a, molestie at, lectus. Suspendisse eget mauris eu
-          tellus molestie cursus. Duis ut magna at justo dignissim condimentum.
-          Cum sociis natoque penatibus et magnis dis parturient montes, nascetur
-          ridiculus mus. Vivamus varius. Ut sit amet diam suscipit mauris ornare
-          aliquam. Sed varius. Duis arcu. Etiam tristique massa eget dui.
-          Phasellus congue. Aenean est erat, tincidunt eget, venenatis quis,
-          commodo at, quam.
+          {currentUnit?.description}
         </p>
       </div>
       <Popup isOpen={isOpen} setIsOpen={setIsOpen} title="All Exams">
-        <ExamList exams={exams?.flat() ?? []} />
+        <ExamList exams={exams ?? []} />
       </Popup>
     </>
   );
