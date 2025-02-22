@@ -102,7 +102,7 @@ export default function LoginPage() {
             href="/signup"
             className="text-sky-600 text-sm mt-2 block text-center"
           >
-            Don't have an account? Sign up
+            Don&apos;t have an account? Sign up
           </a>
         </div>
       </div>
