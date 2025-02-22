@@ -1,8 +1,8 @@
-"use client"
+"use client";
 import { createContext, useContext, useEffect, useState } from "react";
 
 type SnackbarProps = {
-  message: string;
+  message: string | null;
   type: "success" | "error";
   onClose: () => void;
 };
@@ -33,7 +33,7 @@ export const SnackbarProvider: React.FC<SnackbarContextProviderProps> = ({
   children,
 }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
   const [severity, setSeverity] = useState<"error" | "success">("success");
 
   const showSnackbar = (message: string, severity: "success" | "error") => {
@@ -73,12 +73,14 @@ export default function Snackbar({ message, type, onClose }: SnackbarProps) {
 
   return (
     <div className="fixed top-4 right-2 z-50">
-      <div
-        className={`${bgColors[type]} ${textColors[type]} px-6 py-3 rounded-lg shadow-lg
+      {message && (
+        <div
+          className={`${bgColors[type]} ${textColors[type]} px-6 py-3 rounded-lg shadow-lg
                 animate-[slideUp_0.3s_ease-in-out]`}
-      >
-        {message}
-      </div>
+        >
+          {message}
+        </div>
+      )}
     </div>
   );
 }
