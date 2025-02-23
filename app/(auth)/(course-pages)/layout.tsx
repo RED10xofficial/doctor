@@ -5,7 +5,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SnackbarProvider>
       <section>
-        <div className="max-w-7xl mx-auto pt-5">
+        <div className="max-w-7xl mx-auto pt-5 pb-5">
           <Breadcrumb />
         </div>
         {children}

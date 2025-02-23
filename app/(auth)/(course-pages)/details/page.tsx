@@ -16,6 +16,7 @@ import useSWR from "swr";
 import { fetcher } from "@/lib/utils";
 import { Exam, Section } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import LoadingSpinner from "@/app/components/LoadingSpinner";
 
 interface SectionWithUnits extends Section {
   units: UnitWithExams[];
@@ -77,7 +78,7 @@ export default function DetailsPage() {
   );
 
   if (isLoading) {
-    return <div>Loading sections...</div>;
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -89,7 +90,12 @@ export default function DetailsPage() {
       <div className="flex gap-4 max-w-7xl mx-auto p-2 pt-4">
         <div className="hidden md:block">
           {sections && (
-            <Modules sections={sections} setCurrentIndex={setCurrentIndex} />
+            <Modules 
+            sections={sections} 
+            setCurrentIndex={setCurrentIndex} 
+            currentSection={currentSectionIndex}
+            currentUnit={currentUnitIndex}
+          />
           )}
         </div>
         <div className="flex-1 bg-white rounded-lg p-4">
@@ -143,6 +149,8 @@ export default function DetailsPage() {
                       <Modules
                         sections={sections}
                         setCurrentIndex={setCurrentIndex}
+                        currentSection={currentSectionIndex}
+                        currentUnit={currentUnitIndex}
                       />
                     )}
                   </div>
@@ -230,9 +238,8 @@ const CourseDetails = (props: CourseDetailsProps) => {
       <p className="text-gray-500 text-sm mt-4 border-b pb-4"></p>
       <div className="mt-6">
         <h2 className="text-xl font-semibold text-gray-600">Description</h2>
-        <p className="text-gray-500 text-sm mt-2">
-          {currentUnit?.description}
-        </p>
+        <div className="text-gray-500 text-sm mt-2" dangerouslySetInnerHTML={{ __html: currentUnit?.description || '' }}>
+        </div>
       </div>
       <Popup isOpen={isOpen} setIsOpen={setIsOpen} title="All Exams">
         <ExamList exams={exams ?? []} />

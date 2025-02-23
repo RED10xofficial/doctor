@@ -7,6 +7,7 @@ import { fetcher } from "@/lib/utils";
 import useSWR from "swr";
 import { Section } from "@prisma/client";
 import { redirect } from "next/navigation";
+import LoadingSpinner from "@/app/components/LoadingSpinner";
 
 export default function Home() {
   const { data: sections, error, isLoading } = useSWR("/api/sections", fetcher);
@@ -15,7 +16,7 @@ export default function Home() {
     return <div>Failed to load sections</div>;
   }
   if (isLoading) {
-    return <div>Loading sections...</div>;
+    return <LoadingSpinner />;
   }
 
   const OPTIONS: EmblaOptionsType = { align: "start", loop: true };
