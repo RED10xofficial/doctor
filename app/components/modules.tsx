@@ -1,9 +1,4 @@
 "use client";
-import {
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-} from "@headlessui/react";
 import { ChevronUpIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
