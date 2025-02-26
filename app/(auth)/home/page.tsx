@@ -169,6 +169,15 @@ export default function Home() {
                 </span>
                 <div className="absolute inset-0 bg-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
               </Link>
+              <Link
+                href="/my-exams"
+                className="group px-8 py-3 bg-blue-600 text-white rounded-full font-semibold border-2 border-blue-600 transition-all duration-300 relative overflow-hidden"
+              >
+                <span className="relative z-10 group-hover:text-blue-600 transition-colors">
+                  View My Exams
+                </span>
+                <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+              </Link>
             </div>
           </div>
         </div>
