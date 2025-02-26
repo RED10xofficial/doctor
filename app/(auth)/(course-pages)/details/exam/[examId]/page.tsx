@@ -1,7 +1,7 @@
 "use client";
 
 import Popup from "@/app/components/popup";
-import { Timer } from "lucide-react";
+import { Loader, Timer } from "lucide-react";
 import { useEffect, useState } from "react";
 import ExamInstructions from "../../components/examInstructions";
 import { redirect, useParams } from "next/navigation";
@@ -9,6 +9,7 @@ import useSWR from "swr";
 import { useSession } from "next-auth/react";
 import { useSnackbar } from "@/app/components/Snackbar";
 import {Option}  from '@prisma/client';
+import LoadingSpinner from "@/app/components/LoadingSpinner";
 
 interface Question {
   id: string;
@@ -87,7 +88,7 @@ export default function ExamPage() {
   };
 
   if (isLoading) {
-    return <div>Loading exam...</div>;
+    return <LoadingSpinner />;
   }
 
   if (error || !exam) {
@@ -122,6 +123,7 @@ export default function ExamPage() {
     });
     if (response.ok) {
       showSnackbar("Your answers have been submitted", "success");
+      redirect(`/detailed-result/${examId}`);
     }
   };
 
@@ -172,10 +174,10 @@ export default function ExamPage() {
               </div>
             ))}
           </div>
-          <div>
+          <div className="mt-4">
             <button
               type="button"
-              className="w-full bg-sky-400 text-white py-2 px-4 rounded-lg hover:bg-sky-500 transition-colors duration-300"
+              className=" bg-sky-400 text-white py-2 px-4 rounded-lg hover:bg-sky-500 transition-colors duration-300"
               onClick={()=> submitExam()}
             >
               Submit
