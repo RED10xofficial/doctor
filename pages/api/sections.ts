@@ -18,7 +18,16 @@ export default async function handler(
   try {
     await authMiddleware(req, res); // Authentication
 
+    const query: Record<string, string> =  {};
+
+    const { examType } = req.query;
+
+    if(examType){
+      query.examType = examType as string;
+    }
+
     const sections = await prisma.section.findMany({
+      where: {...query},
       include: {
         units: {
           include: {

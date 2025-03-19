@@ -8,9 +8,13 @@ import useSWR from "swr";
 import { Section } from "@prisma/client";
 import { redirect } from "next/navigation";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
-  const { data: sections, error, isLoading } = useSWR("/api/sections", fetcher);
+
+  const session = useSession();
+
+  const { data: sections, error, isLoading } = useSWR(`/api/sections?examType=${session.data?.user.examType}`, fetcher);
 
   if (error) {
     return <div>Failed to load sections</div>;

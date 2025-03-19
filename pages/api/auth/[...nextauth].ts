@@ -1,11 +1,22 @@
 // pages/api/auth/[...nextauth].ts
-
-import NextAuth, { Session, SessionStrategy } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcryptjs";
+import NextAuth, { Session, SessionStrategy, User } from "next-auth";
 import prisma from "@/lib/prisma";
 import { JWT } from "next-auth/jwt";
+
+interface CustomSessionUser {
+    id: string;
+    name: string;
+    email: string;
+    image?: string | null;
+    examType: string;
+}
+
+interface CustomSession extends Session {
+  user: CustomSessionUser;
+}
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
@@ -32,11 +43,12 @@ export const authOptions = {
           bcrypt.compareSync(credentials.password, user.password)
         ) {
           return {
-            id: `${user.id}`,
+            id: user.id.toString(),
             username: user.email,
             name: user.name,
             image: user.image,
             email: user.email,
+            examType: user.examType,
           };
         } else {
           throw Error("Incorrect email / password");
@@ -50,20 +62,23 @@ export const authOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user: Session["user"] }) {
+    async jwt({ token, user }: { token: JWT; user: User }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
+        // @ts-expect-error - ExamType is not a standard property on the User object
+        token.examType = user.examType;
       }
       return token;
     },
-    async session({ session, token }: { session: Session; token: JWT }) {
-      if (token && session?.user) {
-        session.user.id = token.id as string;
-        session.user.email = token.email;
-        session.user.name = token.name;
-      }
+    async session({ session, token }: { session: CustomSession; token: JWT }) {
+      session.user = {
+        id: token.id as string,
+        name: token.name as string,
+        email: token.email as string,
+        examType: token.examType as string,
+      };
       return session;
     },
   },
