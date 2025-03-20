@@ -1,7 +1,7 @@
 "use client";
 
 import Popup from "@/app/components/popup";
-import { Loader, Timer } from "lucide-react";
+import { Timer } from "lucide-react";
 import { useEffect, useState } from "react";
 import ExamInstructions from "../../components/examInstructions";
 import { redirect, useParams } from "next/navigation";
