@@ -1,12 +1,12 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
 import { authMiddleware } from "./middleware";
+import { Difficulty } from "@prisma/client";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-
   await authMiddleware(req, res);
 
   if (req.method === "POST") {
@@ -61,6 +61,36 @@ export default async function handler(
               question.answer.toLowerCase() ===
               String(answerText).toLowerCase(),
             score: parseFloat(score),
+          },
+        });
+
+        const stats = await prisma.examScore.aggregate({
+          where: { questionId },
+          _count: {
+            _all: true, // Total attempts
+            isCorrect: true, // Correct attempts
+          },
+        });
+
+        const totalAttempts = stats._count._all;
+        const correctAttempts = stats._count.isCorrect || 0;
+
+        const percentage = (correctAttempts / totalAttempts) * 100;
+
+        let difficulty: Difficulty = "MEDIUM";
+
+        if (percentage <= 30) {
+          difficulty = "HARD";
+        } else if (percentage >= 80) {
+          difficulty = "EASY";
+        }
+
+        await prisma.question.update({
+          where: {
+            id: questionId,
+          },
+          data: {
+            difficulty,
           },
         });
 
