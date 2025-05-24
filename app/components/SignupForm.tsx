@@ -50,7 +50,7 @@ export default function SignupForm() {
   };
 
   return (
-    <div className="p-8 bg-sky-50">
+    <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
       <h2 className="text-primaryText text-2xl font-semibold mb-6 text-center">
         Create an Account
       </h2>
