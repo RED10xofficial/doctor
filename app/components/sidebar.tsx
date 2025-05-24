@@ -1,8 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
+
 import {
   Home,
   Inbox,
@@ -19,6 +20,7 @@ interface NavItem {
   path: string;
   icon: React.ReactNode;
   activeColor?: string;
+  onClick?: () => void;
 }
 
 const Sidebar = () => {
@@ -61,14 +63,15 @@ const Sidebar = () => {
     },
     {
       name: "Logout",
-      path: "/logout",
+      path: "#",
       icon: <LogOut size={16} strokeWidth={1.5} />,
       activeColor: "#F13E3E",
+      onClick: () => signOut(),
     },
   ];
 
   return (
-    <aside className="w-[210px] flex flex-col justify-between bg-white shadow-lg rounded-tl-[20px] rounded-bl-[20px] p-8 h-screen">
+    <aside className="w-[210px] fixed top-0 left-0 z-50 flex flex-col justify-between bg-white shadow-lg rounded-tl-[20px] rounded-bl-[20px] p-8 h-screen">
       <div className="flex flex-col gap-12">
         {/* Logo Section */}
         <div className="flex items-center gap-2">
@@ -135,11 +138,25 @@ const Sidebar = () => {
                 ? item.activeColor || "#202020"
                 : "#202020";
 
-            return (
+            return item.onClick ? (
+              <button
+                key={item.name}
+                onClick={item.onClick}
+                className="flex items-center gap-3 py-2 rounded-full transition-colors text-left"
+              >
+                <span style={{ color: iconColor }}>{item.icon}</span>
+                <span
+                  className="font-medium text-base"
+                  style={{ color: textColor }}
+                >
+                  {item.name}
+                </span>
+              </button>
+            ) : (
               <Link
                 href={item.path}
                 key={item.name}
-                className={`flex items-center gap-3 py-2 rounded-full transition-colors`}
+                className="flex items-center gap-3 py-2 rounded-full transition-colors"
               >
                 <span style={{ color: iconColor }}>{item.icon}</span>
                 <span
