@@ -29,7 +29,7 @@ type SectionWithUnits = Section & {
 export default async function DetailsPage({
   searchParams,
 }: {
-  searchParams: { currentSection?: string };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const session = await auth();
   
@@ -38,8 +38,8 @@ export default async function DetailsPage({
   }
 
   // Await searchParams before accessing its properties
-  const params = await Promise.resolve(searchParams);
-  const currentSectionIndex = parseInt(params.currentSection || "0");
+  const params = await searchParams;
+  const currentSectionIndex = parseInt((params.currentSection as string) || "0");
 
   // Fetch sections with units and exams in a single query
   const sections = await prisma.section.findMany({
