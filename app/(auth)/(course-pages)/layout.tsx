@@ -29,7 +29,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
     <SessionProvider initialSession={session}>
       <SnackbarProvider>
         <section>
-          <div className="max-w-7xl mx-auto pt-5 pb-5">
+          <div className="max-w-screen-2xl mx-auto pt-5 pb-5">
             <Breadcrumb />
           </div>
           {childrenWithSession}
