@@ -15,7 +15,7 @@ export default async function Layout({
     <AuthProvider>
       <section>
         <Navigation />
-        <div className="mt-[50px] bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50">
+        <div className="mt-[50px] bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 min-h-screen">
           {children}
         </div>
       </section>
