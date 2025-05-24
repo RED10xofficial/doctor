@@ -12,7 +12,7 @@ export default function Breadcrumb() {
     .filter(segment => segment !== '');
 
   return (
-    <nav aria-label="Breadcrumb" className="max-w-7xl mx-auto">
+    <nav aria-label="Breadcrumb">
       <ol className="flex items-center space-x-2">
         <li>
           <Link href="/home" className="text-gray-500 hover:text-gray-700 flex items-center gap-2 text-sm">
