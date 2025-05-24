@@ -53,9 +53,7 @@ interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default function DetailedResultPage({
-  params,
-}: PageProps) {
+export default function DetailedResultPage({ params }: PageProps) {
   return (
     <SessionWrapper>
       {(session) => <DetailedResultContent session={session} params={params} />}
@@ -75,7 +73,7 @@ async function DetailedResultContent({
   const studentId = parseInt(session.user.id);
 
   // Fetch exam with questions, options, and statistics
-  const exam = await prisma.exam.findUnique({
+  const exam = (await prisma.exam.findUnique({
     where: { id: examId },
     include: {
       questions: {
@@ -94,41 +92,55 @@ async function DetailedResultContent({
         },
       },
     },
-  }) as ExamWithRelations | null;
+  })) as ExamWithRelations | null;
 
   if (!exam) {
     redirect("/details");
   }
 
   // Calculate statistics
-  const questions: ExamStatistics["questions"] = exam.questions.reduce((acc: ExamStatistics["questions"], question) => {
-    acc[question.id] = {
-      id: question.id,
-      question: question.question,
-      options: question.options.map((option: Option) => ({
-        ...option,
-        correctAnswer: option.optionKey === question.answer
-      }))
-    };
+  const questions: ExamStatistics["questions"] = exam.questions.reduce(
+    (acc: ExamStatistics["questions"], question) => {
+      acc[question.id] = {
+        id: question.id,
+        question: question.question,
+        options: question.options.map((option: Option) => ({
+          ...option,
+          correctAnswer: option.optionKey === question.answer,
+        })),
+      };
 
-    return acc;
-  }, {} as ExamStatistics["questions"]);
+      return acc;
+    },
+    {} as ExamStatistics["questions"]
+  );
 
-  const data: ExamStatistics["data"] = exam.questions.reduce((acc: ExamStatistics["data"], question) => {
-    const correctAnswers = question.examScores.filter((score: ExamScore) => score.isCorrect).length;
-    const incorrectAnswers = question.examScores.filter((score: ExamScore) => !score.isCorrect).length;
-    const isCorrect = question.examScores.some((score: ExamScore) => score.isCorrect);
+  const data: ExamStatistics["data"] = exam.questions.reduce(
+    (acc: ExamStatistics["data"], question) => {
+      const correctAnswers = question.examScores.filter(
+        (score: ExamScore) => score.isCorrect
+      ).length;
+      const incorrectAnswers = question.examScores.filter(
+        (score: ExamScore) => !score.isCorrect
+      ).length;
+      const isCorrect = question.examScores.some(
+        (score: ExamScore) => score.isCorrect
+      );
 
-    acc[question.id] = {
-      totalCorrect: correctAnswers,
-      totalInCorrect: incorrectAnswers,
-      isCorrect
-    };
+      acc[question.id] = {
+        totalCorrect: correctAnswers,
+        totalInCorrect: incorrectAnswers,
+        isCorrect,
+      };
 
-    return acc;
-  }, {} as ExamStatistics["data"]);
+      return acc;
+    },
+    {} as ExamStatistics["data"]
+  );
 
-  const totalPoints = exam.examScores.reduce((sum, score) => sum + score.score, 0);
+  const totalPoints = exam.examScores
+    .filter((score: ExamScore) => score.isCorrect)
+    .reduce((sum: number, score: ExamScore) => sum + score.score, 0);
   const maxPoints = exam.questions.length;
 
   const examData: ExamStatistics = {
@@ -140,7 +152,7 @@ async function DetailedResultContent({
     totalPoints,
     maxPoints,
     questions,
-    data
+    data,
   };
 
   return (
