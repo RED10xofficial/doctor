@@ -67,6 +67,7 @@ export default async function handler(
               select: {
                 id: true,
                 text: true,
+                optionKey: true
               },
             },
           },
