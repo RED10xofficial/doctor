@@ -1,6 +1,6 @@
 "use client";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { Link } from "lucide-react";
+import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 
 export default function Navigation() {
