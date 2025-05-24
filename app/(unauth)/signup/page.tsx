@@ -25,10 +25,12 @@ export default async function SignupPage() {
         <Image
           src="/register.png"
           alt="Medical Illustration"
-          className="w-full max-w-2xl p-8"
+          className="w-full max-w-md rounded-lg"
           width={500}
           height={500}
           priority
+          quality={75}
+          sizes="(max-width: 768px) 100vw, 50vw"
         />
       </div>
 

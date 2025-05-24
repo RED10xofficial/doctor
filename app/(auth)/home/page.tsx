@@ -6,14 +6,8 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import TestimonialsCarousel from "@/app/components/TestimonialsCarousel";
-
-interface Testimonial {
-  name: string;
-  comment: string;
-}
-
-// Move testimonials data to a separate constant
-const testimonials: Testimonial[] = [
+// Move testimonials data to a separate file
+const testimonials = [
   {
     name: "John Doe",
     comment: "This service was fantastic! Highly recommend to everyone.",
@@ -66,32 +60,35 @@ export default async function Home() {
     redirect("/login");
   }
 
-  // Server-side data fetching
+  // Server-side data fetching with pagination
   const sections = await prisma.section.findMany({
     where: {
       examType: session.user.examType
+    },
+    take: 8, // Limit initial load
+    orderBy: {
+      name: 'asc'
     }
   });
 
   return (
     <>
       <div className="w-full min-h-screen bg-gradient-to-b from-blue-200 to-white relative overflow-hidden">
-        {/* Grid Background Pattern */}
+        {/* Optimize background patterns by reducing number of elements */}
         <div className="absolute inset-0 w-full h-full">
           <div className="grid-background"></div>
         </div>
 
-        {/* Existing Animated Patterns */}
+        {/* Reduce number of animated elements */}
         <div className="absolute inset-0 w-full h-full">
-          {/* Grid Pattern */}
           <div className="absolute inset-0 opacity-[0.15]">
-            <div className="absolute w-full h-full grid grid-cols-8 gap-1">
-              {[...Array(64)].map((_, i) => (
+            <div className="absolute w-full h-full grid grid-cols-4 gap-2">
+              {[...Array(16)].map((_, i) => (
                 <div
                   key={i}
                   className="animate-grid-fade aspect-square bg-blue-500/20 rounded-full"
                   style={{
-                    animationDelay: `${Math.random() * 4}s`,
+                    animationDelay: `${Math.random() * 2}s`,
                     opacity: Math.random() * 0.3,
                   }}
                 ></div>
@@ -99,9 +96,9 @@ export default async function Home() {
             </div>
           </div>
 
-          {/* Floating Circles */}
+          {/* Reduce number of floating circles */}
           <div className="absolute inset-0">
-            {[...Array(6)].map((_, i) => (
+            {[...Array(3)].map((_, i) => (
               <div
                 key={i}
                 className="absolute animate-float-circles rounded-full"
@@ -110,18 +107,11 @@ export default async function Home() {
                   height: `${Math.random() * 100 + 50}px`,
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 5}s`,
+                  animationDelay: `${Math.random() * 3}s`,
                   background: `radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)`,
                 }}
               ></div>
             ))}
-          </div>
-
-          {/* Animated Lines */}
-          <div className="absolute inset-0">
-            <div className="absolute left-0 right-0 top-1/4 h-px bg-gradient-to-r from-transparent via-blue-200 to-transparent animate-slide-right"></div>
-            <div className="absolute left-0 right-0 top-2/4 h-px bg-gradient-to-r from-transparent via-blue-200 to-transparent animate-slide-left"></div>
-            <div className="absolute left-0 right-0 top-3/4 h-px bg-gradient-to-r from-transparent via-blue-200 to-transparent animate-slide-right"></div>
           </div>
         </div>
 
