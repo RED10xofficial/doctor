@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { Suspense } from "react";
@@ -7,6 +6,8 @@ import LoadingState from "@/app/components/LoadingState";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import ClientWrapper from "./components/ClientWrapper";
 import { Option, Exam, Question, ExamScore } from "@prisma/client";
+import SessionWrapper from "../../context/SessionWrapper";
+import { Session } from "next-auth";
 
 export const metadata: Metadata = {
   title: "Detailed Result - Medical Education Platform",
@@ -52,15 +53,23 @@ interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function DetailedResultPage({
+export default function DetailedResultPage({
   params,
 }: PageProps) {
-  const session = await auth();
-  
-  if (!session) {
-    redirect("/login");
-  }
+  return (
+    <SessionWrapper>
+      {(session) => <DetailedResultContent session={session} params={params} />}
+    </SessionWrapper>
+  );
+}
 
+async function DetailedResultContent({
+  session,
+  params,
+}: {
+  session: Session;
+  params: Promise<{ examId: string }>;
+}) {
   const resolvedParams = await params;
   const examId = parseInt(resolvedParams.examId);
   const studentId = parseInt(session.user.id);

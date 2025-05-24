@@ -1,12 +1,12 @@
 import { Metadata } from "next";
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { Section, Exam } from "@prisma/client";
 import { Suspense } from "react";
 import LoadingState from "@/app/components/LoadingState";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import ClientWrapper from "./components/ClientWrapper";
+import SessionWrapper from "../context/SessionWrapper";
+import { Session } from "next-auth";
 
 export const metadata: Metadata = {
   title: "Course Details - Medical Education Platform",
@@ -26,17 +26,25 @@ type SectionWithUnits = Section & {
   }[];
 };
 
-export default async function DetailsPage({
+export default function DetailsPage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const session = await auth();
-  
-  if (!session) {
-    redirect("/login");
-  }
+  return (
+    <SessionWrapper>
+      {(session) => <DetailsContent session={session} searchParams={searchParams} />}
+    </SessionWrapper>
+  );
+}
 
+async function DetailsContent({
+  session,
+  searchParams,
+}: {
+  session: Session;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   // Await searchParams before accessing its properties
   const params = await searchParams;
   const currentSectionIndex = parseInt((params.currentSection as string) || "0");
