@@ -10,7 +10,11 @@ interface PageProps {
   session: Session;
 }
 
-export default async function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const session = await auth();
 
   if (!session) {
@@ -29,7 +33,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
     <SessionProvider initialSession={session}>
       <SnackbarProvider>
         <section>
-          <div className="max-w-screen-2xl mx-auto pt-5 pb-5">
+          <div className="max-w-screen-2xl mx-auto">
             <Breadcrumb />
           </div>
           {childrenWithSession}

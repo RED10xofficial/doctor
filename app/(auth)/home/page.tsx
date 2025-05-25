@@ -1,219 +1,345 @@
-import { EmblaOptionsType } from "embla-carousel";
 import "../../css/embla.css";
 import Link from "next/link";
-import { Section } from "@prisma/client";
+import { Section, Unit, Exam } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
-import TestimonialsCarousel from "@/app/components/TestimonialsCarousel";
-// Move testimonials data to a separate file
-const testimonials = [
-  {
-    name: "John Doe",
-    comment: "This service was fantastic! Highly recommend to everyone.",
-  },
-  {
-    name: "Jane Smith",
-    comment: "A wonderful experience from start to finish. Will definitely return!",
-  },
-  {
-    name: "Alice Johnson",
-    comment: "I was very satisfied with the quality and attention to detail.",
-  },
-  {
-    name: "Bob Brown",
-    comment: "Excellent customer support and a great product. Five stars!",
-  },
-  {
-    name: "Emily Davis",
-    comment: "I can't say enough good things about this place. Truly exceptional!",
-  },
-  {
-    name: "Michael Wilson",
-    comment: "The team was professional and attentive. I felt valued as a customer.",
-  },
-  {
-    name: "Sarah Miller",
-    comment: "Amazing experience! The staff went above and beyond to help me.",
-  },
-  {
-    name: "David Garcia",
-    comment: "Quality service and a friendly atmosphere. I will be back!",
-  },
-  {
-    name: "Laura Martinez",
-    comment: "I loved every moment! The attention to detail was impressive.",
-  },
-  {
-    name: "James Anderson",
-    comment: "A top-notch experience! I highly recommend this to everyone.",
-  },
-];
 
-const OPTIONS: EmblaOptionsType = { align: "start", loop: true };
+// Define extended Unit type with exams
+type UnitWithExams = Unit & {
+  exams: Exam[];
+  section: Section;
+};
 
 // Main page component (server component)
 export default async function Home() {
   const session = await auth();
-  
+
   if (!session) {
     redirect("/login");
   }
 
-  // Server-side data fetching with pagination
-  const sections = await prisma.section.findMany({
+  const examType = session.user.examType;
+
+  // Get counts for dashboard stats
+  const sectionsCount = await prisma.section.count({
     where: {
-      examType: session.user.examType
+      examType: examType,
     },
-    take: 8, // Limit initial load
-    orderBy: {
-      name: 'asc'
-    }
   });
 
+  const unitsCount = await prisma.unit.count({
+    where: {
+      section: {
+        examType: examType,
+      },
+    },
+  });
+
+  const examsCount = await prisma.exam.count({
+    where: {
+      unit: {
+        section: {
+          examType: examType,
+        },
+      },
+    },
+  });
+
+  // Fetch popular units
+  const popularUnits = (await prisma.unit.findMany({
+    where: {
+      section: {
+        examType: examType,
+      },
+    },
+    take: 5,
+    orderBy: {
+      exams: {
+        _count: "desc",
+      },
+    },
+    include: {
+      exams: true,
+      section: true,
+    },
+  })) as UnitWithExams[];
+
   return (
-    <>
-      <div className="w-full min-h-screen bg-gradient-to-b from-blue-200 to-white relative overflow-hidden">
-        {/* Optimize background patterns by reducing number of elements */}
-        <div className="absolute inset-0 w-full h-full">
-          <div className="grid-background"></div>
+    <div className="flex flex-col items-center p-5 gap-6">
+      {/* Container with purple background and stars */}
+      <div className="w-full bg-[#702DFF] rounded-[20px] relative overflow-hidden p-5">
+        {/* Star decorations */}
+        <div className="absolute top-[45px] right-[80px] w-[80px] h-[80px] opacity-25">
+          <svg
+            viewBox="0 0 80 80"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M40 0L48.9 30.3L80 40L48.9 49.7L40 80L31.1 49.7L0 40L31.1 30.3L40 0Z"
+              fill="white"
+            />
+          </svg>
+        </div>
+        <div className="absolute top-[93px] right-[10px] w-[80px] h-[80px] opacity-10">
+          <svg
+            viewBox="0 0 80 80"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M40 0L48.9 30.3L80 40L48.9 49.7L40 80L31.1 49.7L0 40L31.1 30.3L40 0Z"
+              fill="white"
+            />
+          </svg>
+        </div>
+        <div className="absolute top-[122px] right-[150px] w-[118px] h-[118px] opacity-10">
+          <svg
+            viewBox="0 0 118 118"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M59 0L72.1 46.6L118 59L72.1 71.4L59 118L45.9 71.4L0 59L45.9 46.6L59 0Z"
+              fill="white"
+            />
+          </svg>
+        </div>
+        <div className="absolute top-[-59px] right-[10px] w-[61px] h-[118px] opacity-10">
+          <svg
+            viewBox="0 0 61 118"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M30.5 0L37.2 23.3L59 30.5L37.2 37.7L30.5 61L23.8 37.7L2 30.5L23.8 23.3L30.5 0Z"
+              fill="white"
+            />
+          </svg>
+        </div>
+        <div className="absolute top-[20px] right-[140px] w-[61px] h-[60px] opacity-10">
+          <svg
+            viewBox="0 0 61 60"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M30.5 0L37.2 23.3L59 30.5L37.2 37.7L30.5 61L23.8 37.7L2 30.5L23.8 23.3L30.5 0Z"
+              fill="white"
+            />
+          </svg>
         </div>
 
-        {/* Reduce number of animated elements */}
-        <div className="absolute inset-0 w-full h-full">
-          <div className="absolute inset-0 opacity-[0.15]">
-            <div className="absolute w-full h-full grid grid-cols-4 gap-2">
-              {[...Array(16)].map((_, i) => (
-                <div
-                  key={i}
-                  className="animate-grid-fade aspect-square bg-blue-500/20 rounded-full"
-                  style={{
-                    animationDelay: `${Math.random() * 2}s`,
-                    opacity: Math.random() * 0.3,
-                  }}
-                ></div>
-              ))}
-            </div>
-          </div>
+        {/* Content */}
+        <div className="px-6 py-5 max-w-md">
+          <div className="text-white text-xs uppercase mb-2">ONLINE COURSE</div>
+          <h1 className="text-2xl font-semibold text-white mb-4">
+            Advance Your Medical Career
+            <br />
+            With Expert-Led Courses
+          </h1>
 
-          {/* Reduce number of floating circles */}
-          <div className="absolute inset-0">
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute animate-float-circles rounded-full"
-                style={{
-                  width: `${Math.random() * 100 + 50}px`,
-                  height: `${Math.random() * 100 + 50}px`,
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 3}s`,
-                  background: `radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)`,
-                }}
-              ></div>
-            ))}
-          </div>
-        </div>
-
-        {/* Hero content */}
-        <div className="relative max-w-screen-xl mx-auto px-4 h-screen flex items-center">
-          <div className="w-full max-w-3xl mx-auto text-center space-y-8">
-            <div className="space-y-4">
-              <h1 className="animate-slide-up text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
-                Advance Your Medical Career
-                <span className="animate-slide-up-delay-1 block text-blue-600 mt-2">
-                  With Expert-Led Courses
-                </span>
-              </h1>
-              <p className="animate-slide-up-delay-2 text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-                Access comprehensive medical courses, certification exams, and
-                professional development resources designed for healthcare
-                professionals.
-              </p>
-            </div>
-
-            {/* Stats section */}
-            <div className="animate-slide-up-delay-3 grid grid-cols-2 md:grid-cols-3 gap-8 pt-8">
-              <div className="text-center transform hover:scale-105 transition-transform duration-300">
-                <div className="text-3xl font-bold text-blue-600 mb-2 animate-number">
-                  1000+
-                </div>
-                <div className="text-sm text-gray-600">Sections</div>
-              </div>
-              <div className="text-center transform hover:scale-105 transition-transform duration-300">
-                <div className="text-3xl font-bold text-blue-600 mb-2 animate-number">
-                  50k+
-                </div>
-                <div className="text-sm text-gray-600">Units</div>
-              </div>
-              <div className="hidden md:block text-center transform hover:scale-105 transition-transform duration-300">
-                <div className="text-3xl font-bold text-blue-600 mb-2 animate-number">
-                  98%
-                </div>
-                <div className="text-sm text-gray-600">Exams</div>
-              </div>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="animate-slide-up-delay-4 flex flex-col sm:flex-row gap-4 justify-center pt-8">
-              <Link
-                href="/details"
-                className="group px-8 py-3 bg-white text-blue-600 rounded-full font-semibold border-2 border-blue-600 transition-all duration-300 relative overflow-hidden"
+          {/* CTA Buttons */}
+          <div className="flex flex-row gap-3 mt-6">
+            <Link
+              href="/details"
+              className="px-4 py-2 bg-white text-purple-700 rounded-lg text-sm font-medium border border-white hover:bg-transparent hover:text-white transition-all duration-300 flex items-center gap-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <span className="relative z-10 group-hover:text-white transition-colors">
-                  Explore Courses
-                </span>
-                <div className="absolute inset-0 bg-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
-              </Link>
-              <Link
-                href="/my-exams"
-                className="group px-8 py-3 bg-blue-600 text-white rounded-full font-semibold border-2 border-blue-600 transition-all duration-300 relative overflow-hidden"
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                />
+              </svg>
+              Explore Courses
+            </Link>
+            <Link
+              href="/my-exams"
+              className="px-4 py-2 bg-transparent text-white rounded-lg text-sm font-medium border border-white hover:bg-white hover:text-purple-700 transition-all duration-300 flex items-center gap-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <span className="relative z-10 group-hover:text-blue-600 transition-colors">
-                  View My Exams
-                </span>
-                <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
-              </Link>
-            </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                />
+              </svg>
+              View My Exams
+            </Link>
           </div>
         </div>
       </div>
 
-      <div className="w-full h-auto bg-white">
-        <div className="max-w-screen-2xl mx-auto h-full px-8">
-          <div className="w-full h-full container mx-auto py-10">
-            <h2 className="text-primaryText text-2xl lg:text-4xl font-semibold mb-4 text-center">
-              Courses
-            </h2>
-            <div className="w-full h-full grid grid-cols-1 lg:grid-cols-4 gap-4">
-              {sections.map((s: Section, i: number) => (
-                <Link
-                  key={`section-${i}`}
-                  href={`/details?currentSection=${i}`}
-                  className="w-full h-full bg-gray-100 rounded-xl p-6 shadow-lg cursor-pointer hover:shadow-2xl transition-all duration-300 border border-transparent hover:border-sky-400"
-                >
-                  <p className="text-primaryText text-lg font-semibold">
-                    {s.name}
-                  </p>
-                  <p className="text-gray-500 text-sm mt-1">
-                    Learn the best practices for Angular development.
-                  </p>
-                  <p className="text-lg font-semibold text-blue-600">
-                    $199.00
-                  </p>
-                </Link>
-              ))}
+      {/* Stats cards row */}
+      <div className="w-full grid grid-cols-3 gap-3">
+        <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between">
+          <div className="flex-grow">
+            <div className="text-3xl font-normal text-gray-700">
+              {sectionsCount}
             </div>
+            <div className="text-sm text-gray-600">Sections</div>
+          </div>
+          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-purple-700"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between">
+          <div className="flex-grow">
+            <div className="text-3xl font-normal text-gray-700">
+              {unitsCount}
+            </div>
+            <div className="text-sm text-gray-600">Units</div>
+          </div>
+          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-purple-700"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between">
+          <div className="flex-grow">
+            <div className="text-3xl font-normal text-gray-700">
+              {examsCount}
+            </div>
+            <div className="text-sm text-gray-600">Exams</div>
+          </div>
+          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-purple-700"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
           </div>
         </div>
       </div>
 
-      <div className="w-full h-auto bg-gradient-to-r from-sky-100/30 to-pink-100/30 via-gray-50 py-8">
-        <h2 className="text-primaryText text-2xl lg:text-4xl font-semibold mb-8 text-center">
-          Student Testimonials
+      {/* Continue Learning Section */}
+      {/* <div className="w-full mt-5">
+        <h2 className="text-xl font-medium text-gray-800 mb-5">
+          Continue Learning
         </h2>
-        <TestimonialsCarousel testimonials={testimonials} options={OPTIONS} />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {sections.slice(0, 3).map((section, index) => (
+            <div
+              key={`continue-${index}`}
+              className="bg-white rounded-2xl p-4 border border-gray-100 shadow-md"
+            >
+              <div className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs uppercase mb-3">
+                {section.examType || "Frontend"}
+              </div>
+              <h3 className="text-sm font-medium text-gray-800 leading-tight mb-2">
+                Beginner&apos;s Guide to becoming a professional {section.name}{" "}
+                developer
+              </h3>
+            </div>
+          ))}
+        </div>
+      </div> */}
+
+      {/* Popular Units Table */}
+      <div className="w-full mt-5">
+        <div className="flex justify-between items-center mb-5">
+          <h2 className="text-xl font-medium text-gray-800">Popular Units</h2>
+          <Link href="/units" className="text-blue-600 text-xs">
+            See All
+          </Link>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 grid grid-cols-3">
+            <div className="text-xs font-semibold text-gray-600 uppercase">
+              Unit Name
+            </div>
+            <div className="text-xs font-semibold text-gray-600 uppercase">
+              Section Name
+            </div>
+            <div className="text-xs font-semibold text-gray-600 uppercase text-right">
+              Actions
+            </div>
+          </div>
+
+          {popularUnits.map((unit, index) => (
+            <div
+              key={`unit-${index}`}
+              className="px-6 py-4 border-b border-gray-100 grid grid-cols-3 items-center"
+            >
+              <div>
+                <h3 className="text-sm font-medium text-gray-800">
+                  {unit.name}
+                </h3>
+                <p className="text-xs text-gray-500">
+                  Exams: {unit.exams.length}
+                </p>
+              </div>
+              <div>
+                <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs">
+                  {unit.section.name}
+                </span>
+              </div>
+              <div className="text-right">
+                <Link
+                  href={`/units/${unit.id}`}
+                  className="px-3 py-1 bg-blue-100 text-blue-600 rounded-lg text-xs"
+                >
+                  SHOW DETAILS
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -8,7 +8,7 @@ import { redirect, useParams } from "next/navigation";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
 import { useSnackbar } from "@/app/components/Snackbar";
-import {Option}  from '@prisma/client';
+import { Option } from "@prisma/client";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
 
 interface Question {
@@ -129,7 +129,7 @@ export default function ExamPage() {
 
   return (
     <>
-      <div className="flex-1 bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-10 min-h-screen">
+      <div className="flex-1 bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-screen">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between bg-gray-200/50 backdrop-blur-sm p-4 rounded-lg sticky top-0 z-10">
             <div>
@@ -159,7 +159,11 @@ export default function ExamPage() {
                         name={`question-${question.id}`} // Unique name for each question
                         id={`option-${option.id}`} // Unique id for each option
                         onChange={() => {
-                          answerQuestion(question.id, option.optionKey, option.id);
+                          answerQuestion(
+                            question.id,
+                            option.optionKey,
+                            option.id
+                          );
                         }}
                       />
                       <label
@@ -178,7 +182,7 @@ export default function ExamPage() {
             <button
               type="button"
               className=" bg-sky-400 text-white py-2 px-4 rounded-lg hover:bg-sky-500 transition-colors duration-300"
-              onClick={()=> submitExam()}
+              onClick={() => submitExam()}
             >
               Submit
             </button>

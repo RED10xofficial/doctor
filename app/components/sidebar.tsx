@@ -13,6 +13,7 @@ import {
   Settings,
   LogOut,
   Star,
+  Book,
 } from "lucide-react";
 
 interface NavItem {
@@ -29,38 +30,38 @@ const Sidebar = () => {
   const navItems: NavItem[] = [
     {
       name: "Dashboard",
-      path: "/dashboard",
+      path: "/home",
       icon: <Home size={16} strokeWidth={1.5} />,
       activeColor: "#702DFF",
     },
     {
-      name: "Inbox",
-      path: "/inbox",
-      icon: <Inbox size={16} strokeWidth={1.5} />,
+      name: "Sections",
+      path: "/details",
+      icon: <Book size={16} strokeWidth={1.5} />,
     },
     {
-      name: "Lesson",
+      name: "Exams",
       path: "/lesson",
       icon: <FolderOpen size={16} strokeWidth={1.5} />,
     },
     {
-      name: "Task",
-      path: "/task",
+      name: "My Exams",
+      path: "/my-exams",
       icon: <CheckSquare size={16} strokeWidth={1.5} />,
     },
-    {
-      name: "Group",
-      path: "/group",
-      icon: <Users size={16} strokeWidth={1.5} />,
-    },
+    // {
+    //   name: "Group",
+    //   path: "/group",
+    //   icon: <Users size={16} strokeWidth={1.5} />,
+    // },
   ];
 
   const settingsItems: NavItem[] = [
-    {
-      name: "Settings",
-      path: "/settings",
-      icon: <Settings size={16} strokeWidth={1.5} />,
-    },
+    // {
+    //   name: "Settings",
+    //   path: "/settings",
+    //   icon: <Settings size={16} strokeWidth={1.5} />,
+    // },
     {
       name: "Logout",
       path: "#",
@@ -79,7 +80,7 @@ const Sidebar = () => {
             <Star size={20} color="white" />
           </div>
           <span className="font-extrabold text-transparent text-lg bg-clip-text bg-gradient-to-r from-[#702DFF] via-[#7550FB] to-[#4A3AFF] uppercase">
-            cOURSUE
+            Study.io
           </span>
         </div>
 
