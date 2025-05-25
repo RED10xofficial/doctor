@@ -46,7 +46,7 @@ export default async function ExamPage({
   params: Promise<{ examId: string }>;
 }) {
   const { examId } = await params;
-  
+
   return (
     <SessionWrapper>
       {(session: Session) => (
