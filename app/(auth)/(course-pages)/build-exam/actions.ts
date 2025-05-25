@@ -4,7 +4,11 @@ import prisma from "@/lib/prisma";
 import { Difficulty } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
-export async function createCustomExam(examName: string, difficulty: string, questionCount: number) {
+export async function createCustomExam(
+  examName: string,
+  difficulty: string,
+  questionCount: number
+) {
   try {
     // Convert difficulty string to enum
     const difficultyEnum = difficulty.toUpperCase() as Difficulty;
@@ -21,7 +25,9 @@ export async function createCustomExam(examName: string, difficulty: string, que
     });
 
     if (questions.length < questionCount) {
-      throw new Error(`Not enough ${difficulty} questions available. Only ${questions.length} found.`);
+      throw new Error(
+        `Not enough ${difficulty} questions available. Only ${questions.length} found.`
+      );
     }
 
     // Create a new exam
@@ -31,22 +37,24 @@ export async function createCustomExam(examName: string, difficulty: string, que
         unitId: 1, // You might want to make this dynamic based on your needs
         duration: 60, // Default duration in minutes
         questions: {
-          create: questions.map(question => ({
-            questionId: question.id
-          }))
-        }
+          create: questions.map((question) => ({
+            questionId: question.id,
+          })),
+        },
+        instruction:
+          "This is an exam build based on the difficulty of your choice. Please answer all questions to the best of your ability.",
       },
       include: {
         questions: {
           include: {
             question: {
               include: {
-                options: true
-              }
-            }
-          }
-        }
-      }
+                options: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     revalidatePath("/build-exam");
@@ -55,4 +63,4 @@ export async function createCustomExam(examName: string, difficulty: string, que
     console.error("Error creating custom exam:", error);
     throw error;
   }
-} 
+}
