@@ -94,7 +94,7 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
         examId: exam.id,
       });
       showSnackbar("Your answers have been submitted", "success");
-      router.push(`/detailed-result/${exam.id}`);
+      router.push(`/exam-result/${exam.id}`);
     } catch {
       showSnackbar("Failed to submit exam", "error");
     }
