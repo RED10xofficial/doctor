@@ -9,6 +9,14 @@ export default function Breadcrumb() {
 
   const segments = pathname?.split("/").filter((segment) => segment !== "");
 
+  const formatLabel = (text: string) => {
+    return text
+      .replace(/-/g, " ")
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   return (
     <nav aria-label="Breadcrumb" className="pb-3 px-4 pt-5">
       <ol className="flex items-center space-x-2">
@@ -31,14 +39,14 @@ export default function Breadcrumb() {
               </span>
               {isLast ? (
                 <span className="text-gray-900 font-medium text-sm">
-                  {segment.charAt(0).toUpperCase() + segment.slice(1)}
+                  {formatLabel(segment)}
                 </span>
               ) : (
                 <Link
                   href={path}
                   className="text-gray-500 hover:text-gray-700 text-sm"
                 >
-                  {segment.charAt(0).toUpperCase() + segment.slice(1)}
+                  {formatLabel(segment)}
                 </Link>
               )}
             </li>

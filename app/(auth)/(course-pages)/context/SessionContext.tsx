@@ -43,8 +43,7 @@ export function SessionProvider({
         }
         
         setSession(data);
-      } catch (error) {
-        console.error("Error fetching session:", error);
+      } catch {
         router.push("/login");
       } finally {
         setIsLoading(false);
