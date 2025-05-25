@@ -5,6 +5,12 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import React from "react";
 import { Session } from "next-auth";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Course Pages",
+  description: "Course content and learning materials",
+};
 
 interface PageProps {
   session: Session;
