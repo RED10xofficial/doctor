@@ -109,7 +109,7 @@ export default function ClientWrapper({ exams }: ClientWrapperProps) {
               </div>
 
               <Link
-                href={`/detailed-result/${exam.id}`}
+                href={`/exam-result/${exam.id}`}
                 className="mt-5 w-full bg-[rgba(112,45,255,0.2)] rounded-[40px] py-2.5 px-3 flex items-center justify-center text-[#702DFF] font-medium text-sm hover:bg-[rgba(112,45,255,0.3)] transition-colors duration-300"
               >
                 View Details
