@@ -4,13 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 
-import {
-  Home,
-  CheckSquare,
-  LogOut,
-  Star,
-  Book,
-} from "lucide-react";
+import { Home, CheckSquare, LogOut, Star, Book } from "lucide-react";
 
 interface NavItem {
   name: string;
@@ -70,9 +64,11 @@ const Sidebar = () => {
           <div className="w-10 h-10 rounded-full bg-[#702DFF] flex items-center justify-center">
             <Star size={20} color="white" />
           </div>
-          <span className="font-extrabold text-transparent text-lg bg-clip-text bg-gradient-to-r from-[#702DFF] via-[#7550FB] to-[#4A3AFF] uppercase">
-            Study.io
-          </span>
+          <Link href={"/home"} className="text-[#202020] font-semibold text-lg">
+            <span className="font-extrabold text-transparent text-lg bg-clip-text bg-gradient-to-r from-[#702DFF] via-[#7550FB] to-[#4A3AFF] uppercase">
+              Study.io
+            </span>
+          </Link>
         </div>
 
         {/* Overview Section */}

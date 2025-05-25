@@ -5,6 +5,7 @@ import { Plus, X, User } from "lucide-react";
 import Link from "next/link";
 import { Session } from "next-auth";
 import { useProfile } from "./ProfileContext";
+import Image from "next/image";
 
 // Type for the exam objects
 interface Exam {
@@ -66,10 +67,12 @@ const ProfileToggle = ({ session, userExams }: ProfileToggleProps) => {
         <div className="relative">
           <div className="w-[100px] h-[100px] rounded-full bg-gradient-to-br from-gray-300/30 to-gray-300/30 border-4 border-[#702DFF]">
             <div className="w-[72px] h-[72px] rounded-full bg-gray-300 absolute top-[14px] left-[14px] overflow-hidden shadow-lg">
-              <img
-                src="profile.webp"
+              <Image
+                src="/profile.webp"
                 alt="Profile"
                 className="w-full h-full object-cover"
+                width={500}
+                height={500}
               />
             </div>
           </div>
