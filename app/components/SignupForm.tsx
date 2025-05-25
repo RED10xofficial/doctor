@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useForm } from "react-hook-form";
 import { useState } from "react";
@@ -66,9 +66,7 @@ export default function SignupForm() {
             placeholder="Enter your full name"
           />
           {errors.name && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.name.message}
-            </p>
+            <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
           )}
         </div>
 
@@ -86,9 +84,7 @@ export default function SignupForm() {
             placeholder="Enter your phone number"
           />
           {errors.phone && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.phone.message}
-            </p>
+            <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
           )}
         </div>
 
@@ -106,9 +102,7 @@ export default function SignupForm() {
             placeholder="Enter your email"
           />
           {errors.email && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.email.message}
-            </p>
+            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
           )}
         </div>
 
@@ -152,9 +146,7 @@ export default function SignupForm() {
         </div>
 
         <div>
-          <label className="block text-gray-700 mb-2">
-            Confirm Password
-          </label>
+          <label className="block text-gray-700 mb-2">Confirm Password</label>
           <input
             type="password"
             {...register("confirmPassword", {
@@ -174,17 +166,17 @@ export default function SignupForm() {
 
         <button
           type="submit"
-          className="w-full bg-sky-400 text-white py-2 px-4 rounded-lg hover:bg-sky-500 transition-colors duration-300"
+          className="w-full bg-[#702DFF] text-white py-2 px-4 rounded-lg hover:bg-[#702DFF] transition-colors duration-300"
         >
           Sign Up
         </button>
       </form>
       <a
         href="/login"
-        className="text-sky-600 text-sm mt-2 block text-center"
+        className="text-[#702DFF] text-sm mt-2 block text-center"
       >
         Already have an account? Login
       </a>
     </div>
   );
-} 
+}

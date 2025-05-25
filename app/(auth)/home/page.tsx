@@ -66,7 +66,7 @@ export default async function Home() {
   })) as UnitWithExams[];
 
   return (
-    <div className="flex flex-col items-center p-5 gap-6">
+    <div className="flex flex-col items-center gap-6 p-5 max-w-screen-2xl mx-auto">
       {/* Container with purple background and stars */}
       <div className="w-full bg-[#702DFF] rounded-[20px] relative overflow-hidden p-5">
         {/* Star decorations */}

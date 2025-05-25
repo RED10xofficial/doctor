@@ -13,7 +13,7 @@ export default function ExamResultPage() {
 
   return (
     <>
-      <div className="flex-1 bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-screen">
+      <div className="flex-1 rounded-lg p-4 pt-2 min-h-screen">
         <div className="max-w-7xl mx-auto space-y-6 bg-white rounded-xl p-6 shadow-sm">
           {/* Header */}
           <div className="bg-gray-50 rounded-lg p-6 border-gray-100  border">

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Popup from "@/app/components/popup";
 import ExamInstructions from "../../components/examInstructions";
 import { useSnackbar } from "@/app/components/Snackbar";
-import { Option } from '@prisma/client';
+import { Option } from "@prisma/client";
 import { submitAnswer, submitExam } from "../actions";
 
 interface Question {
@@ -77,7 +77,7 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
         score: 1,
       });
     } catch (error) {
-      console.error('Error submitting answer:', error);
+      console.error("Error submitting answer:", error);
       showSnackbar("Failed to submit answer", "error");
     }
   };
@@ -97,7 +97,7 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
 
   return (
     <>
-      <div className="flex-1 bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-10 min-h-screen">
+      <div className="flex-1 rounded-lg p-4 pt-10 min-h-screen">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between bg-gray-200/50 backdrop-blur-sm p-4 rounded-lg sticky top-0 z-10">
             <div>
@@ -123,7 +123,11 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
                         name={`question-${question.id}`}
                         id={`option-${option.id}`}
                         onChange={() => {
-                          handleAnswerQuestion(question.id, option.optionKey, option.id);
+                          handleAnswerQuestion(
+                            question.id,
+                            option.optionKey,
+                            option.id
+                          );
                         }}
                       />
                       <label
@@ -159,4 +163,4 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
       </Popup>
     </>
   );
-} 
+}

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function LoginPage() {
   const session = await auth();
-  
+
   // If user is already logged in, redirect to home
   if (session) {
     redirect("/home");
@@ -32,7 +32,7 @@ export default async function LoginPage() {
       </div>
 
       {/* Right Section - Login Form */}
-      <div className="w-1/2 bg-gradient-to-t from-sky-400 to-sky-200 p-8 flex items-center justify-center">
+      <div className="w-1/2 bg-gradient-to-t from-[#702DFF] to-[#311075] p-8 flex items-center justify-center">
         <LoginForm />
       </div>
     </div>

@@ -36,7 +36,7 @@ export default async function Layout({
           <div className="max-w-screen-2xl mx-auto">
             <Breadcrumb />
           </div>
-          {childrenWithSession}
+          <div className="p-5">{childrenWithSession}</div>
         </section>
       </SnackbarProvider>
     </SessionProvider>

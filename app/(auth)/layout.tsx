@@ -23,7 +23,11 @@ export default async function Layout({
           <Sidebar />
           <ProfileSidebar />
           {/* <Navigation /> */}
-          <ContentWrapper>{children}</ContentWrapper>
+          <ContentWrapper>
+            <div className="bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 min-h-screen">
+              {children}
+            </div>
+          </ContentWrapper>
         </section>
       </ProfileProvider>
     </AuthProvider>

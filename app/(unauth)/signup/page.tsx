@@ -35,7 +35,7 @@ export default async function SignupPage() {
       </div>
 
       {/* Right Section - Login Form */}
-      <div className="w-1/2 bg-gradient-to-t from-sky-400 to-sky-200 p-8 flex items-center justify-center">
+      <div className="w-1/2 bg-gradient-to-t from-[#702DFF] to-[#311075] p-8 flex items-center justify-center">
         <SignupForm />
       </div>
     </div>
