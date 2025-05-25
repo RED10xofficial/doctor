@@ -12,7 +12,7 @@ import { Session } from "next-auth";
 export default function ExamResultPage({
   params,
 }: {
-  params: { examId: string };
+  params: Promise<{ examId: string }>;
 }) {
   return (
     <SessionWrapper>
@@ -26,9 +26,10 @@ async function ExamResultContent({
   params,
 }: {
   session: Session;
-  params: { examId: string };
+  params: Promise<{ examId: string }>;
 }) {
-  const examId = parseInt(params.examId);
+  const resolvedParams = await params;
+  const examId = parseInt(resolvedParams.examId);
   const studentId = parseInt(session.user.id);
 
   if (!examId) {
