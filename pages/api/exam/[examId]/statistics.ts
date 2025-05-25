@@ -44,11 +44,16 @@ async function getExamStatistics(examId: string, studentId: number) {
     select: {
       questions: {
         include: {
-          options: true,
+          question: {
+            include: {
+              options: true,
+            },
+          },
         },
       },
       examScores: {
         where: {
+          studentId,
           submitted: true,
         },
       },
@@ -64,9 +69,7 @@ async function getExamStatistics(examId: string, studentId: number) {
     );
   }
 
-  const examAttended = exam.examScores.find(
-    (examScore) => examScore.studentId === studentId
-  );
+  const examAttended = exam.examScores.length > 0;
 
   if (!examAttended) {
     throw new Error(
@@ -84,8 +87,9 @@ async function getExamStatistics(examId: string, studentId: number) {
   const questions = exam.questions.reduce(
     (
       acc: { [key: string]: Question & { options: Option[] } },
-      question: Question & { options: Option[] }
+      questionExam: { question: Question & { options: Option[] } }
     ) => {
+      const question = questionExam.question;
       acc[question.id] = {
         ...question,
         options: question.options.map((option: Option) => ({
@@ -121,7 +125,7 @@ async function getExamStatistics(examId: string, studentId: number) {
       if (examScore.studentId === studentId) {
         acc[examScore.questionId].isCorrect = examScore.isCorrect ?? false;
         if (examScore.isCorrect) {
-          totalPoints += 1;
+          totalPoints += examScore.score;
         }
       }
 

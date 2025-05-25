@@ -164,9 +164,12 @@ const ProfileToggle = ({ session, userExams }: ProfileToggleProps) => {
         {/* Header */}
         <div className="flex justify-between items-center w-full">
           <h3 className="text-[#202020] font-medium text-base">Your Exams</h3>
-          <button className="w-6 h-6 rounded-full border border-[#9E9E9E] flex items-center justify-center p-1.5">
+          <Link
+            className="w-6 h-6 rounded-full border border-[#9E9E9E] flex items-center justify-center p-1.5"
+            href={"/build-exam"}
+          >
             <Plus className="w-3 h-3 text-[#9E9E9E]" />
-          </button>
+          </Link>
         </div>
 
         {/* Exam Cards Container */}

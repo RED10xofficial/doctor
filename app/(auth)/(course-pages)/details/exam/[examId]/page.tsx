@@ -27,7 +27,11 @@ async function getExamData(examId: string) {
     include: {
       questions: {
         include: {
-          options: true
+          question: {
+            include: {
+              options: true
+            }
+          }
         }
       }
     }
