@@ -48,10 +48,11 @@ export default async function handler(
       where: {
         id: parsedExamId,
       },
-      select: { // Use select to control fields and exclude answer
+      select: {
         id: true,
         name: true,
         instruction: true,
+        duration: true,
         unit: {
           select: {
             id: true,
@@ -60,14 +61,19 @@ export default async function handler(
         },
         questions: {
           select: {
-            id: true,
-            question: true,
-            answer: true,
-            options: {
+            question: {
               select: {
                 id: true,
-                text: true,
-                optionKey: true
+                question: true,
+                questionSlug: true,
+                difficulty: true,
+                options: {
+                  select: {
+                    id: true,
+                    text: true,
+                    optionKey: true
+                  },
+                },
               },
             },
           },

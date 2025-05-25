@@ -28,6 +28,9 @@ export async function submitAnswer(params: SubmitAnswerParams) {
       throw new Error("Question not found");
     }
 
+    const isCorrect = question.answer.toLowerCase() === params.answerText.toLowerCase();
+    const score = isCorrect ? 1.0 : 0.0;
+
     await prisma.examScore.upsert({
       where: {
         studentId_examId_questionId: {
@@ -38,21 +41,24 @@ export async function submitAnswer(params: SubmitAnswerParams) {
       },
       update: {
         studentAnswer: params.studentAnswer,
-        isCorrect: question.answer.toLowerCase() === params.answerText.toLowerCase(),
-        score: params.score,
+        isCorrect,
+        score,
       },
       create: {
         studentId: parseInt(params.studentId),
         examId: params.examId,
         questionId: params.questionId,
         studentAnswer: params.studentAnswer,
-        isCorrect: question.answer.toLowerCase() === params.answerText.toLowerCase(),
-        score: params.score,
+        isCorrect,
+        score,
       },
     });
 
     const stats = await prisma.examScore.aggregate({
-      where: { questionId: params.questionId },
+      where: { 
+        questionId: params.questionId,
+        submitted: true,
+      },
       _count: {
         _all: true,
         isCorrect: true,

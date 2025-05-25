@@ -14,7 +14,9 @@ export const metadata: Metadata = {
   description: "View detailed exam results and statistics",
 };
 
-type OptionType = Option & { correctAnswer: boolean };
+interface PageProps {
+  params: Promise<{ examId: string }>;
+}
 
 interface ExamStatistics {
   id: number;
@@ -40,18 +42,21 @@ interface ExamStatistics {
   };
 }
 
-type ExamWithRelations = Exam & {
-  questions: (Question & {
-    options: Option[];
-    examScores: ExamScore[];
-  })[];
+type OptionType = Option & {
+  correctAnswer: boolean;
+};
+
+type QuestionWithRelations = Question & {
+  options: Option[];
   examScores: ExamScore[];
 };
 
-interface PageProps {
-  params: Promise<{ examId: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
+type ExamWithRelations = Exam & {
+  questions: {
+    question: QuestionWithRelations;
+  }[];
+  examScores: ExamScore[];
+};
 
 export default function DetailedResultPage({ params }: PageProps) {
   return (
@@ -78,10 +83,15 @@ async function DetailedResultContent({
     include: {
       questions: {
         include: {
-          options: true,
-          examScores: {
-            where: {
-              studentId,
+          question: {
+            include: {
+              options: true,
+              examScores: {
+                where: {
+                  studentId,
+                  examId
+                },
+              },
             },
           },
         },
@@ -89,6 +99,7 @@ async function DetailedResultContent({
       examScores: {
         where: {
           studentId,
+          examId
         },
       },
     },
@@ -100,7 +111,8 @@ async function DetailedResultContent({
 
   // Calculate statistics
   const questions: ExamStatistics["questions"] = exam.questions.reduce(
-    (acc: ExamStatistics["questions"], question) => {
+    (acc: ExamStatistics["questions"], questionExam) => {
+      const question = questionExam.question;
       acc[question.id] = {
         id: question.id,
         question: question.question,
@@ -116,7 +128,8 @@ async function DetailedResultContent({
   );
 
   const data: ExamStatistics["data"] = exam.questions.reduce(
-    (acc: ExamStatistics["data"], question) => {
+    (acc: ExamStatistics["data"], questionExam) => {
+      const question = questionExam.question;
       const correctAnswers = question.examScores.filter(
         (score: ExamScore) => score.isCorrect
       ).length;

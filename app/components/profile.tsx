@@ -6,7 +6,9 @@ import ProfileToggle from "./ProfileToggle";
 
 // Define types for exam with questions
 type ExamWithQuestions = Exam & {
-  questions: Question[];
+  questions: {
+    question: Question;
+  }[];
 };
 
 // Function to get user's attended exams
@@ -21,7 +23,11 @@ async function getUserExams(userId: string) {
       include: {
         exam: {
           include: {
-            questions: true,
+            questions: {
+              include: {
+                question: true
+              }
+            },
           },
         },
       },

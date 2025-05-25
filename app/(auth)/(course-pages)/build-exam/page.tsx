@@ -2,16 +2,53 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createCustomExam } from "./actions";
+import { useSnackbar } from "@/app/components/Snackbar";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const examSchema = z.object({
+  examName: z.string().min(1, "Exam name is required"),
+  difficulty: z.enum(["easy", "medium", "hard"]),
+  questionCount: z.number().min(1).max(50),
+});
+
+type ExamFormData = z.infer<typeof examSchema>;
 
 export default function ExamConfig() {
   const router = useRouter();
-  const [difficulty, setDifficulty] = useState("medium");
-  const [questionCount, setQuestionCount] = useState(10);
+  const { showSnackbar } = useSnackbar();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Redirect to exam page with query parameters
-    router.push(`/exam?difficulty=${difficulty}&count=${questionCount}`);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ExamFormData>({
+    resolver: zodResolver(examSchema),
+    defaultValues: {
+      examName: "Your Exam Name",
+      difficulty: "medium",
+      questionCount: 10,
+    },
+  });
+
+  const onSubmit = async (data: ExamFormData) => {
+    setIsLoading(true);
+
+    try {
+      const exam = await createCustomExam(data.examName, data.difficulty, data.questionCount);
+      router.push(`/details/exam/${exam.id}`);
+    } catch (error) {
+      if (error instanceof Error) {
+        showSnackbar(error.message, "error");
+      } else {
+        showSnackbar("Failed to create exam", "error");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -21,7 +58,26 @@ export default function ExamConfig() {
           Configure Your Exam
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div>
+            <label
+              htmlFor="examName"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Exam Name
+            </label>
+            <input
+              type="text"
+              id="examName"
+              {...register("examName")}
+              placeholder="Enter exam name"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            />
+            {errors.examName && (
+              <p className="mt-1 text-sm text-red-600">{errors.examName.message}</p>
+            )}
+          </div>
+
           <div>
             <label
               htmlFor="difficulty"
@@ -31,14 +87,16 @@ export default function ExamConfig() {
             </label>
             <select
               id="difficulty"
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
+              {...register("difficulty")}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             >
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
             </select>
+            {errors.difficulty && (
+              <p className="mt-1 text-sm text-red-600">{errors.difficulty.message}</p>
+            )}
           </div>
 
           <div>
@@ -51,19 +109,22 @@ export default function ExamConfig() {
             <input
               type="number"
               id="questionCount"
+              {...register("questionCount", { valueAsNumber: true })}
               min="1"
               max="50"
-              value={questionCount}
-              onChange={(e) => setQuestionCount(parseInt(e.target.value))}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             />
+            {errors.questionCount && (
+              <p className="mt-1 text-sm text-red-600">{errors.questionCount.message}</p>
+            )}
           </div>
 
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            disabled={isLoading}
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Start Exam
+            {isLoading ? "Building Exam..." : "Start Exam"}
           </button>
         </form>
       </div>

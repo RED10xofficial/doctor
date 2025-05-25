@@ -12,6 +12,8 @@ import { submitAnswer, submitExam } from "../actions";
 interface Question {
   id: number;
   question: string;
+  questionSlug: string;
+  difficulty: string | null;
   options: Option[];
 }
 
@@ -19,7 +21,10 @@ interface Exam {
   id: number;
   name: string;
   instruction: string | null;
-  questions: Question[];
+  duration: number;
+  questions: {
+    question: Question;
+  }[];
 }
 
 interface ExamClientProps {
@@ -111,32 +116,35 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
           </div>
 
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {exam.questions.map((question: Question, index: number) => (
-              <div key={question.id} className="bg-white rounded-lg p-4">
-                <h2 className="text-lg font-semibold">Question {index + 1}</h2>
-                <p className="text-gray-500">{question.question}</p>
-                <div className="mt-4">
-                  {question.options.map((option: Option) => (
-                    <div className="flex items-center mb-3" key={option.id}>
-                      <input
-                        type="radio"
-                        name={`question-${question.id}`}
-                        id={`option-${option.id}`}
-                        onChange={() => {
-                          handleAnswerQuestion(question.id, option.optionKey, option.id);
-                        }}
-                      />
-                      <label
-                        htmlFor={`option-${option.id}`}
-                        className="ml-2 text-gray-500"
-                      >
-                        {option.text}
-                      </label>
-                    </div>
-                  ))}
+            {exam.questions.map((questionExam, index: number) => {
+              const question = questionExam.question;
+              return (
+                <div key={question.id} className="bg-white rounded-lg p-4">
+                  <h2 className="text-lg font-semibold">Question {index + 1}</h2>
+                  <p className="text-gray-500">{question.question}</p>
+                  <div className="mt-4">
+                    {question.options.map((option: Option) => (
+                      <div className="flex items-center mb-3" key={option.id}>
+                        <input
+                          type="radio"
+                          name={`question-${question.id}`}
+                          id={`option-${option.id}`}
+                          onChange={() => {
+                            handleAnswerQuestion(question.id, option.optionKey, option.id);
+                          }}
+                        />
+                        <label
+                          htmlFor={`option-${option.id}`}
+                          className="ml-2 text-gray-500"
+                        >
+                          {option.text}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <div className="mt-4">
             <button
