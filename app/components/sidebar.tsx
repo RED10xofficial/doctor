@@ -6,7 +6,6 @@ import { signOut } from "next-auth/react";
 
 import {
   Home,
-  FolderOpen,
   CheckSquare,
   LogOut,
   Star,
@@ -35,11 +34,6 @@ const Sidebar = () => {
       name: "Sections",
       path: "/details",
       icon: <Book size={16} strokeWidth={1.5} />,
-    },
-    {
-      name: "Exams",
-      path: "/lesson",
-      icon: <FolderOpen size={16} strokeWidth={1.5} />,
     },
     {
       name: "My Exams",
@@ -116,11 +110,11 @@ const Sidebar = () => {
 
       {/* Settings Section */}
       <div className="flex flex-col gap-2.5">
-        <div className="py-2">
+        {/* <div className="py-2">
           <h3 className="text-[#3F3F3F] text-base font-semibold uppercase">
             SETTINGS
           </h3>
-        </div>
+        </div> */}
         <nav className="flex flex-col gap-2">
           {settingsItems.map((item) => {
             const isActive = pathname === item.path;
