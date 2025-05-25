@@ -26,8 +26,8 @@ export default function ClientWrapper({ exams }: ClientWrapperProps) {
         let progressColor = "bg-red-500";
 
         if (percentage >= 70) {
-          scoreColor = "text-green-600";
-          progressColor = "bg-green-500";
+          scoreColor = "text-[#702DFF]";
+          progressColor = "bg-[#702DFF]";
         } else if (percentage >= 50) {
           scoreColor = "text-yellow-600";
           progressColor = "bg-yellow-500";
@@ -36,44 +36,73 @@ export default function ClientWrapper({ exams }: ClientWrapperProps) {
         return (
           <div
             key={exam.id}
-            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100"
+            className="bg-white rounded-[20px] shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100"
           >
             <div className="p-6">
-              <h2 className="text-xl font-bold mb-3 text-gray-800">
+              <h2 className="text-[#202020] font-semibold text-lg mb-4">
                 {exam.examName}
               </h2>
-              <div className="space-y-3 mb-4">
+
+              <div className="space-y-3 mb-5">
                 <div className="flex items-center">
-                  <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-2">
-                    <span className="text-blue-600 text-xs">📚</span>
+                  <div className="w-8 h-8 rounded-full bg-[rgba(112,45,255,0.1)] flex items-center justify-center mr-3">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#702DFF"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z" />
+                      <path d="M8 7h6m-6 5h8m-8 5h4" />
+                    </svg>
                   </div>
-                  <p className="text-gray-700">{exam.unitName}</p>
+                  <p className="text-[#7E7E7E] font-medium">{exam.unitName}</p>
                 </div>
+
                 <div className="flex items-center">
-                  <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center mr-2">
-                    <span className="text-purple-600 text-xs">📝</span>
+                  <div className="w-8 h-8 rounded-full bg-[rgba(112,45,255,0.1)] flex items-center justify-center mr-3">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#702DFF"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+                    </svg>
                   </div>
-                  <p className="text-gray-700">{exam.sectionName}</p>
+                  <p className="text-[#7E7E7E] font-medium">
+                    {exam.sectionName}
+                  </p>
                 </div>
               </div>
 
-              <div className="mt-6 bg-gray-50 p-4 rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium text-gray-700">Score</span>
+              <div className="mt-4 bg-[rgba(112,45,255,0.05)] p-4 rounded-2xl">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="font-medium text-[#202020]">Score</span>
                   <div className="flex items-center">
                     <span className={`text-xl font-bold ${scoreColor}`}>
                       {exam.marksScored}
                     </span>
                     <span className="text-gray-500 mx-1">/</span>
-                    <span className="text-gray-700">{exam.totalMarks}</span>
+                    <span className="text-[#7E7E7E]">{exam.totalMarks}</span>
                     <span className={`ml-2 text-sm font-medium ${scoreColor}`}>
                       ({percentage}%)
                     </span>
                   </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div
-                    className={`${progressColor} h-3 rounded-full transition-all duration-500`}
+                    className={`${progressColor} h-2.5 rounded-full transition-all duration-500`}
                     style={{ width: `${percentage}%` }}
                   ></div>
                 </div>
@@ -81,7 +110,7 @@ export default function ClientWrapper({ exams }: ClientWrapperProps) {
 
               <Link
                 href={`/detailed-result/${exam.id}`}
-                className="mt-4 w-full py-2 bg-blue-50 text-blue-600 rounded-lg font-medium hover:bg-blue-100 transition-colors duration-300 flex items-center justify-center"
+                className="mt-5 w-full bg-[rgba(112,45,255,0.2)] rounded-[40px] py-2.5 px-3 flex items-center justify-center text-[#702DFF] font-medium text-sm hover:bg-[rgba(112,45,255,0.3)] transition-colors duration-300"
               >
                 View Details
                 <svg
@@ -105,4 +134,4 @@ export default function ClientWrapper({ exams }: ClientWrapperProps) {
       })}
     </div>
   );
-} 
+}

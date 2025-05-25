@@ -292,7 +292,7 @@ export default async function Home() {
       <div className="w-full mt-5">
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-xl font-medium text-gray-800">Popular Units</h2>
-          <Link href="/units" className="text-blue-600 text-xs">
+          <Link href="/units" className="text-[#702DFF] text-xs">
             See All
           </Link>
         </div>

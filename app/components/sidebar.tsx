@@ -6,11 +6,8 @@ import { signOut } from "next-auth/react";
 
 import {
   Home,
-  Inbox,
   FolderOpen,
   CheckSquare,
-  Users,
-  Settings,
   LogOut,
   Star,
   Book,
