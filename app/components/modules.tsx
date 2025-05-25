@@ -35,7 +35,7 @@ export default function Modules({
     if (currentSection !== -1 && !openSections.includes(currentSection)) {
       setOpenSections([currentSection]);
     }
-  }, [currentSection]);
+  }, [currentSection, openSections]);
 
   const handleSectionClick = (sectionIndex: number) => {
     setOpenSections((prev) =>
