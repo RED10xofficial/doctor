@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
@@ -27,7 +27,7 @@ export default function LoginForm() {
         redirect: true,
         email: data.email,
         password: data.password,
-        callbackUrl: "/home"
+        callbackUrl: "/home",
       });
     } catch (error) {
       const authError = error as AuthError;
@@ -56,9 +56,7 @@ export default function LoginForm() {
             placeholder="Enter your email"
           />
           {errors.email && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.email.message}
-            </p>
+            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
           )}
         </div>
 
@@ -86,12 +84,9 @@ export default function LoginForm() {
           Login
         </button>
       </form>
-      <a
-        href="/signup"
-        className="text-sky-600 text-sm mt-2 block text-center"
-      >
+      <a href="/signup" className="text-sky-600 text-sm mt-2 block text-center">
         Don&apos;t have an account? Sign up
       </a>
     </div>
   );
-} 
+}
