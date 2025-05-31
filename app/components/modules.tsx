@@ -11,10 +11,8 @@ interface ModulesProps {
           id: number;
           name: string;
           description: string;
-          content: string;
-          videoUrl: string;
-          duration: number;
           sectionId: number;
+          urls?: string;
         }[];
       }[]
     | undefined;

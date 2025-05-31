@@ -9,9 +9,7 @@ type SectionWithUnits = Section & {
     id: number;
     name: string;
     description: string;
-    content: string;
-    videoUrl: string;
-    duration: number;
+    urls?: string;
     sectionId: number;
     exams: Pick<Exam, 'id' | 'name' | 'duration' | 'unitId' | 'instruction'>[];
   }[];

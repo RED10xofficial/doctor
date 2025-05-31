@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { Section, Exam } from "@prisma/client";
 import Modules from "@/app/components/modules";
-import { AlignRightIcon, BookOpenIcon, ClockIcon } from "lucide-react";
+import { AlignRightIcon, BookOpenIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -16,9 +16,7 @@ type SectionWithUnits = Section & {
     id: number;
     name: string;
     description: string;
-    content: string;
-    videoUrl: string;
-    duration: number;
+    urls?: string;
     sectionId: number;
     exams: Pick<Exam, "id" | "name" | "duration" | "unitId" | "instruction">[];
   }[];
@@ -81,14 +79,14 @@ export default function CourseContent({
               <p className="ml-2 text-[#7E7E7E] text-sm font-medium capitalize">
                 {currentSection?.name}
               </p>
-              {currentUnit?.duration && (
+              {/* {currentUnit?.duration && (
                 <div className="flex items-center ml-4">
                   <ClockIcon className="w-4 h-4 text-[#702DFF]" />
                   <span className="ml-1 text-[#7E7E7E] text-sm">
                     {currentUnit.duration} min
                   </span>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
           <div className="flex gap-2">
