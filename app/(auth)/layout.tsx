@@ -1,7 +1,12 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import Navigation from "../components/navigation";
+// import Navigation from "../components/navigation";
 import AuthProvider from "../components/AuthProvider";
+import Sidebar from "../components/sidebar";
+import ProfileSidebar from "../components/profile";
+import { ProfileProvider } from "../components/ProfileContext";
+import ContentWrapper from "../components/ContentWrapper";
+
 export default async function Layout({
   children,
 }: {
@@ -13,12 +18,14 @@ export default async function Layout({
   }
   return (
     <AuthProvider>
-      <section>
-        <Navigation />
-        <div className="mt-[50px] bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50">
-          {children}
-        </div>
-      </section>
+      <ProfileProvider>
+        <section>
+          <Sidebar />
+          <ProfileSidebar />
+          {/* <Navigation /> */}
+          <ContentWrapper>{children}</ContentWrapper>
+        </section>
+      </ProfileProvider>
     </AuthProvider>
   );
 }
