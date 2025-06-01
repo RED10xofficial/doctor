@@ -6,10 +6,13 @@ import Modules from "@/app/components/modules";
 import { AlignRightIcon, BookOpenIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
+import VideoList from "./videoList";
 
 // Dynamically import heavy components
 const ExamList = dynamic(() => import("./examList"), { ssr: false });
 const Popup = dynamic(() => import("@/app/components/popup"), { ssr: false });
+const videolst =
+  "https://www.youtube.com/watch?v=W9JCqnFLL7U,https://www.youtube.com/watch?v=Qb9s3UiMSTA,https://www.youtube.com/watch?v=K56nNuBEd0c,https://www.youtube.com/watch?v=0XR_91AfgZI,https://www.youtube.com/watch?v=ZDa-Z5JzLYM,https://www.youtube.com/watch?v=JeznW_7DlB0";
 
 type SectionWithUnits = Section & {
   units: {
@@ -36,6 +39,7 @@ export default function CourseContent({
     useState(initialSectionIndex);
   const [currentUnitIndex, setCurrentUnitIndex] = useState(0);
   const [isExamPopupOpen, setIsExamPopupOpen] = useState(false);
+  const [isVideoPopupOpen, setIsVideoPopupOpen] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -57,6 +61,7 @@ export default function CourseContent({
 
   const currentSection = sections[currentSectionIndex];
   const currentUnit = currentSection?.units[currentUnitIndex];
+  console.log("urls", currentUnit?.urls);
 
   return (
     <>
@@ -73,6 +78,12 @@ export default function CourseContent({
           <div>
             <h2 className="text-2xl font-bold text-[#202020] capitalize mb-2">
               {currentUnit?.name}
+              <button
+                className="text-[#702DFF] bg-transparent border-none outline-none text-sm ms-2"
+                onClick={() => setIsVideoPopupOpen(true)}
+              >
+                (5 Videos)
+              </button>
             </h2>
             <div className="flex items-center">
               <BookOpenIcon className="w-4 h-4 text-[#702DFF]" />
@@ -122,8 +133,17 @@ export default function CourseContent({
           isOpen={isExamPopupOpen}
           setIsOpen={setIsExamPopupOpen}
           title="All Exams"
+          className="max-w-md"
         >
           <ExamList exams={currentUnit?.exams ?? []} />
+        </Popup>
+        <Popup
+          isOpen={isVideoPopupOpen}
+          setIsOpen={setIsVideoPopupOpen}
+          title="All Videos"
+          className="max-w-3xl"
+        >
+          <VideoList videos={videolst} />
         </Popup>
       </div>
     </>

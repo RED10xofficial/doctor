@@ -46,7 +46,7 @@ export default function Modules({
   return (
     <div className="sticky top-[30px] h-[calc(100vh-30px)] bg-white shadow-lg mb-8 rounded-lg overflow-hidden">
       <div className="p-4 max-h-full overflow-y-auto overflow-x-hidden">
-        <div className="w-[300px] space-y-3">
+        <div className="w-[250px] space-y-3">
           <div className="text-xl font-semibold mb-5 text-[#202020] capitalize border-b border-gray-100 pb-2">
             Course Modules
           </div>
