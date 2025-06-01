@@ -99,8 +99,7 @@ export default async function handler(
         console.error(error);
         res.status(500).json({ error: "Failed to submit exam score" });
       }
-    } catch (error) {
-      console.log(error);
+    } catch {
       res.status(500).json({ error: "Failed to fetch question" });
     }
   } else {

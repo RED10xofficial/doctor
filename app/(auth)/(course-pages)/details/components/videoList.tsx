@@ -89,6 +89,7 @@ export default function VideoList({ videos }: { videos: string }) {
                 src={video.thumbnail}
                 alt={video.title}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"
                 onError={(e) => {
                   // Fallback to default thumbnail if maxresdefault doesn't exist

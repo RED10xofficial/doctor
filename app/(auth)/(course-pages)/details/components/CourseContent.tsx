@@ -61,7 +61,6 @@ export default function CourseContent({
 
   const currentSection = sections[currentSectionIndex];
   const currentUnit = currentSection?.units[currentUnitIndex];
-  console.log("urls", currentUnit?.urls);
 
   return (
     <>
