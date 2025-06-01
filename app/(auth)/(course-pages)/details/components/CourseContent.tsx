@@ -11,8 +11,6 @@ import VideoList from "./videoList";
 // Dynamically import heavy components
 const ExamList = dynamic(() => import("./examList"), { ssr: false });
 const Popup = dynamic(() => import("@/app/components/popup"), { ssr: false });
-const videolst =
-  "https://www.youtube.com/watch?v=W9JCqnFLL7U,https://www.youtube.com/watch?v=Qb9s3UiMSTA,https://www.youtube.com/watch?v=K56nNuBEd0c,https://www.youtube.com/watch?v=0XR_91AfgZI,https://www.youtube.com/watch?v=ZDa-Z5JzLYM,https://www.youtube.com/watch?v=JeznW_7DlB0";
 
 type SectionWithUnits = Section & {
   units: {
@@ -81,7 +79,7 @@ export default function CourseContent({
                 className="text-[#702DFF] bg-transparent border-none outline-none text-sm ms-2"
                 onClick={() => setIsVideoPopupOpen(true)}
               >
-                (5 Videos)
+                {`(${currentUnit?.urls?.split(",").length ?? 0} Videos)`}
               </button>
             </h2>
             <div className="flex items-center">
@@ -142,7 +140,7 @@ export default function CourseContent({
           title="All Videos"
           className="max-w-3xl"
         >
-          <VideoList videos={videolst} />
+          <VideoList videos={currentUnit?.urls ?? ""} />
         </Popup>
       </div>
     </>
