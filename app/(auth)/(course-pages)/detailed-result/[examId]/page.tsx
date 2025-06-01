@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { Suspense } from "react";
-import LoadingState from "@/app/components/LoadingState";
+import LoadingState from "./loading";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import ClientWrapper from "./components/ClientWrapper";
 import { Option, Exam, Question, ExamScore } from "@prisma/client";
@@ -89,7 +89,7 @@ async function DetailedResultContent({
               examScores: {
                 where: {
                   studentId,
-                  examId
+                  examId,
                 },
               },
             },
@@ -99,7 +99,7 @@ async function DetailedResultContent({
       examScores: {
         where: {
           studentId,
-          examId
+          examId,
         },
       },
     },
@@ -172,7 +172,7 @@ async function DetailedResultContent({
     <div className="flex-1 bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-screen">
       <div className="space-y-6 bg-white rounded-xl p-4 shadow-sm">
         <ErrorBoundary>
-          <Suspense fallback={<LoadingState type="content" />}>
+          <Suspense fallback={<LoadingState />}>
             <ClientWrapper examData={examData} />
           </Suspense>
         </ErrorBoundary>
