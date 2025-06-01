@@ -11,7 +11,7 @@ export default function ContentWrapper({
 
   return (
     <div
-      className={`ms-[210px] ${isProfileExpanded ? "me-[280px]" : "me-0"} ${
+      className={`${isProfileExpanded ? "me-[280px]" : "me-0"} ${
         isSideMenuExpanded ? "ms-[210px]" : "ms-20"
       } bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 min-h-screen transition-all duration-300`}
     >
