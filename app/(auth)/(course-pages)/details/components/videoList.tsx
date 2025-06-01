@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 interface VideoData {
   id: string;
@@ -84,10 +85,11 @@ export default function VideoList({ videos }: { videos: string }) {
             onClick={() => handleVideoClick(video.url)}
           >
             <div className="relative aspect-video">
-              <img
+              <Image
                 src={video.thumbnail}
                 alt={video.title}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
                 onError={(e) => {
                   // Fallback to default thumbnail if maxresdefault doesn't exist
                   const target = e.target as HTMLImageElement;
