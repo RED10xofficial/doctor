@@ -10,7 +10,7 @@ const ClientWrapper = dynamic(() => import("./components/ClientWrapper"), {
   ssr: true,
   loading: () => (
     <div className="flex-1 bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-screen">
-      <div className="max-w-screen-2xl mx-auto space-y-6">
+      <div className="p-4 space-y-6">
         <div className="flex justify-between items-center mb-6">
           <div className="h-8 w-48 bg-gray-200 animate-pulse rounded" />
           <div className="h-10 w-32 bg-gray-200 animate-pulse rounded" />
@@ -101,7 +101,7 @@ async function MyExamsContent({ session }: { session: Session }) {
 
   return (
     <div className="flex-1 bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-screen">
-      <div className="max-w-screen-2xl mx-auto space-y-6">
+      <div className="p-4 space-y-6">
         <ErrorBoundary>
           <Suspense fallback={<div className="animate-pulse">Loading...</div>}>
             <ClientWrapper exams={attendedExams} />

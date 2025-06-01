@@ -3,12 +3,7 @@ import { Skeleton } from "../../components/Skeleton";
 export default function ExamsLoading() {
   return (
     <div className="flex-1 bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-screen">
-      <div className="max-w-screen-2xl mx-auto space-y-6">
-        <div className="flex justify-between items-center mb-6">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-10 w-32" />
-        </div>
-        
+      <div className="p-4 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="bg-white rounded-xl shadow-md p-6 space-y-4">

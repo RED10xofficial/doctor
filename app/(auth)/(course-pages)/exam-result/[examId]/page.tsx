@@ -82,7 +82,7 @@ async function ExamResultContent({
 
   return (
     <div className="flex-1 bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-screen">
-      <div className="max-w-screen-2xl mx-auto space-y-6 bg-white rounded-xl p-6 shadow-sm">
+      <div className="space-y-6 bg-white rounded-xl p-4 shadow-sm">
         <ErrorBoundary>
           <Suspense fallback={<LoadingState type="content" />}>
             {/* Header */}

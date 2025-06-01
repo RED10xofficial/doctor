@@ -41,7 +41,7 @@ export default async function Layout({
       <SessionProvider initialSession={session}>
         <SnackbarProvider>
           <section>
-            <div className="max-w-screen-2xl mx-auto">
+            <div className="p-4">
               <Breadcrumb />
             </div>
             {childrenWithSession}
