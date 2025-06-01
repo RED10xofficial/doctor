@@ -18,7 +18,7 @@ export function CourseLayoutProvider({
   // Immediately set the profile to collapsed on mount
   useEffect(() => {
     setIsProfileExpanded(false);
-    setIsSideMenuExpanded(true);
+    setIsSideMenuExpanded(false);
   }, []); // Run only on mount
 
   // Update document attribute for CSS targeting

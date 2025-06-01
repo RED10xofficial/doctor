@@ -30,7 +30,7 @@ const ProfileToggle = ({ session, userExams }: ProfileToggleProps) => {
   // Collapsed profile button
   if (!isProfileExpanded) {
     return (
-      <div className="fixed top-20 right-0 z-50">
+      <div className="fixed top-10 right-0 z-50">
         <button
           onClick={toggleProfile}
           className="bg-white w-14 h-14 rounded-l-full shadow-lg flex items-center justify-center transition-all hover:bg-gray-50 border-l border-t border-b border-gray-100"

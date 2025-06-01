@@ -3,8 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useProfile } from "./ProfileContext";
+import { useState } from "react";
 
-import { Home, CheckSquare, LogOut, Star, Book } from "lucide-react";
+import {
+  Home,
+  CheckSquare,
+  LogOut,
+  Star,
+  Book,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 interface NavItem {
   name: string;
@@ -16,23 +26,27 @@ interface NavItem {
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const { isSideMenuExpanded, setIsSideMenuExpanded } = useProfile();
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const navItems: NavItem[] = [
     {
       name: "Dashboard",
       path: "/home",
-      icon: <Home size={16} strokeWidth={1.5} />,
+      icon: <Home size={isSideMenuExpanded ? 18 : 16} strokeWidth={1.5} />,
       activeColor: "#702DFF",
     },
     {
       name: "Sections",
       path: "/details",
-      icon: <Book size={16} strokeWidth={1.5} />,
+      icon: <Book size={isSideMenuExpanded ? 18 : 16} strokeWidth={1.5} />,
     },
     {
       name: "My Exams",
       path: "/my-exams",
-      icon: <CheckSquare size={16} strokeWidth={1.5} />,
+      icon: (
+        <CheckSquare size={isSideMenuExpanded ? 18 : 16} strokeWidth={1.5} />
+      ),
     },
     // {
     //   name: "Group",
@@ -50,115 +64,206 @@ const Sidebar = () => {
     {
       name: "Logout",
       path: "#",
-      icon: <LogOut size={16} strokeWidth={1.5} />,
+      icon: <LogOut size={isSideMenuExpanded ? 18 : 16} strokeWidth={1.5} />,
       activeColor: "#F13E3E",
       onClick: () => signOut(),
     },
   ];
 
+  const toggleSidebar = () => {
+    setIsSideMenuExpanded(!isSideMenuExpanded);
+  };
+
   return (
-    <aside className="w-[210px] fixed top-0 left-0 z-50 flex flex-col justify-between bg-white shadow-lg rounded-tl-[20px] rounded-bl-[20px] p-8 h-screen">
-      <div className="flex flex-col gap-12">
-        {/* Logo Section */}
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-[#702DFF] flex items-center justify-center">
-            <Star size={20} color="white" />
+    <>
+      <aside
+        className={`fixed top-0 left-0 z-50 flex flex-col justify-between bg-white shadow-lg rounded-tl-[20px] rounded-bl-[20px] p-8 h-screen transition-all duration-300 ease-in-out overflow-hidden ${
+          isSideMenuExpanded ? "w-[210px]" : "w-[80px]"
+        }`}
+      >
+        {/* Toggle Button - positioned outside the sidebar bounds */}
+        <button
+          onClick={toggleSidebar}
+          className={`fixed top-6 w-6 h-6 bg-[#702DFF] rounded-full flex items-center justify-center shadow-md hover:bg-[#5a25d4] transition-all duration-300 ease-in-out z-[60] ${
+            isSideMenuExpanded ? "left-[197px]" : "left-[67px]"
+          }`}
+        >
+          {isSideMenuExpanded ? (
+            <ChevronLeft size={14} color="white" />
+          ) : (
+            <ChevronRight size={14} color="white" />
+          )}
+        </button>
+
+        <div className="flex flex-col gap-12">
+          {/* Logo Section */}
+          <div className="flex items-center gap-2">
+            <div
+              className={`w-10 h-10 rounded-full bg-[#702DFF] flex items-center justify-center flex-shrink-0 ${
+                isSideMenuExpanded ? "w-10 h-10" : "w-6 h-6"
+              }`}
+            >
+              <Star size={isSideMenuExpanded ? 20 : 16} color="white" />
+            </div>
+            {isSideMenuExpanded && (
+              <Link
+                href={"/home"}
+                className="text-[#202020] font-semibold text-lg whitespace-nowrap"
+              >
+                <span className="font-extrabold text-transparent text-lg bg-clip-text bg-gradient-to-r from-[#702DFF] via-[#7550FB] to-[#4A3AFF] uppercase">
+                  Study.io
+                </span>
+              </Link>
+            )}
           </div>
-          <Link href={"/home"} className="text-[#202020] font-semibold text-lg">
-            <span className="font-extrabold text-transparent text-lg bg-clip-text bg-gradient-to-r from-[#702DFF] via-[#7550FB] to-[#4A3AFF] uppercase">
-              Study.io
-            </span>
-          </Link>
+
+          {/* Overview Section */}
+          <div className="flex flex-col gap-2.5">
+            {isSideMenuExpanded && (
+              <div className="py-2">
+                <h3 className="text-[#3F3F3F] text-base font-semibold uppercase whitespace-nowrap">
+                  OVERVIEW
+                </h3>
+              </div>
+            )}
+            <nav className="flex flex-col gap-2">
+              {navItems.map((item) => {
+                const isActive = pathname === item.path;
+                return (
+                  <div key={item.name} className="relative">
+                    <Link
+                      href={item.path}
+                      className={`flex items-center gap-3 py-2 rounded-full transition-colors ${
+                        isActive
+                          ? "text-[#702DFF]"
+                          : "text-[#202020] hover:text-gray-600"
+                      }`}
+                      onMouseEnter={() =>
+                        !isSideMenuExpanded && setHoveredItem(item.name)
+                      }
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      <span
+                        className={`flex-shrink-0 ${
+                          isActive ? "text-[#702DFF]" : "text-[#202020]"
+                        }`}
+                      >
+                        {item.icon}
+                      </span>
+                      {isSideMenuExpanded && (
+                        <span className="font-medium text-base whitespace-nowrap">
+                          {item.name}
+                        </span>
+                      )}
+                    </Link>
+                  </div>
+                );
+              })}
+            </nav>
+          </div>
         </div>
 
-        {/* Overview Section */}
+        {/* Settings Section */}
         <div className="flex flex-col gap-2.5">
-          <div className="py-2">
-            <h3 className="text-[#3F3F3F] text-base font-semibold uppercase">
-              OVERVIEW
-            </h3>
-          </div>
+          {/* {isSideMenuExpanded && (
+            <div className="py-2">
+              <h3 className="text-[#3F3F3F] text-base font-semibold uppercase whitespace-nowrap">
+                SETTINGS
+              </h3>
+            </div>
+          )} */}
           <nav className="flex flex-col gap-2">
-            {navItems.map((item) => {
+            {settingsItems.map((item) => {
               const isActive = pathname === item.path;
+              const textColor = isActive
+                ? item.activeColor || "#202020"
+                : item.name === "Logout"
+                ? "#F13E3E"
+                : "#202020";
+              const iconColor =
+                item.name === "Logout"
+                  ? "#F13E3E"
+                  : isActive
+                  ? item.activeColor || "#202020"
+                  : "#202020";
+
               return (
-                <Link
-                  href={item.path}
-                  key={item.name}
-                  className={`flex items-center gap-3 py-2 rounded-full transition-colors ${
-                    isActive
-                      ? "text-[#702DFF]"
-                      : "text-[#202020] hover:text-gray-600"
-                  }`}
-                >
-                  <span
-                    className={isActive ? "text-[#702DFF]" : "text-[#202020]"}
-                  >
-                    {item.icon}
-                  </span>
-                  <span className="font-medium text-base">{item.name}</span>
-                </Link>
+                <div key={item.name} className="relative">
+                  {item.onClick ? (
+                    <button
+                      onClick={item.onClick}
+                      className="flex items-center gap-3 py-2 rounded-full transition-colors text-left w-full"
+                      onMouseEnter={() =>
+                        !isSideMenuExpanded && setHoveredItem(item.name)
+                      }
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      <span
+                        style={{ color: iconColor }}
+                        className="flex-shrink-0"
+                      >
+                        {item.icon}
+                      </span>
+                      {isSideMenuExpanded && (
+                        <span
+                          className="font-medium text-base whitespace-nowrap"
+                          style={{ color: textColor }}
+                        >
+                          {item.name}
+                        </span>
+                      )}
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.path}
+                      className="flex items-center gap-3 py-2 rounded-full transition-colors"
+                      onMouseEnter={() =>
+                        !isSideMenuExpanded && setHoveredItem(item.name)
+                      }
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      <span
+                        style={{ color: iconColor }}
+                        className="flex-shrink-0"
+                      >
+                        {item.icon}
+                      </span>
+                      {isSideMenuExpanded && (
+                        <span
+                          className="font-medium text-base whitespace-nowrap"
+                          style={{ color: textColor }}
+                        >
+                          {item.name}
+                        </span>
+                      )}
+                    </Link>
+                  )}
+                </div>
               );
             })}
           </nav>
         </div>
-      </div>
+      </aside>
 
-      {/* Settings Section */}
-      <div className="flex flex-col gap-2.5">
-        {/* <div className="py-2">
-          <h3 className="text-[#3F3F3F] text-base font-semibold uppercase">
-            SETTINGS
-          </h3>
-        </div> */}
-        <nav className="flex flex-col gap-2">
-          {settingsItems.map((item) => {
-            const isActive = pathname === item.path;
-            const textColor = isActive
-              ? item.activeColor || "#202020"
-              : item.name === "Logout"
-              ? "#F13E3E"
-              : "#202020";
-            const iconColor =
-              item.name === "Logout"
-                ? "#F13E3E"
-                : isActive
-                ? item.activeColor || "#202020"
-                : "#202020";
-
-            return item.onClick ? (
-              <button
-                key={item.name}
-                onClick={item.onClick}
-                className="flex items-center gap-3 py-2 rounded-full transition-colors text-left"
-              >
-                <span style={{ color: iconColor }}>{item.icon}</span>
-                <span
-                  className="font-medium text-base"
-                  style={{ color: textColor }}
-                >
-                  {item.name}
-                </span>
-              </button>
-            ) : (
-              <Link
-                href={item.path}
-                key={item.name}
-                className="flex items-center gap-3 py-2 rounded-full transition-colors"
-              >
-                <span style={{ color: iconColor }}>{item.icon}</span>
-                <span
-                  className="font-medium text-base"
-                  style={{ color: textColor }}
-                >
-                  {item.name}
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-    </aside>
+      {/* Tooltip container - outside sidebar */}
+      {!isSideMenuExpanded && hoveredItem && (
+        <div
+          className="fixed left-[88px] bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap z-[80] pointer-events-none transition-opacity duration-200"
+          style={{
+            top:
+              hoveredItem === "Logout"
+                ? "calc(100vh - 80px)"
+                : `${
+                    120 +
+                    navItems.findIndex((item) => item.name === hoveredItem) * 40
+                  }px`,
+          }}
+        >
+          {hoveredItem}
+          <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-800 rotate-45"></div>
+        </div>
+      )}
+    </>
   );
 };
 
