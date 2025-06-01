@@ -77,7 +77,17 @@ export function HeroSkeleton() {
   );
 }
 
-export function ProfileSkeleton() {
+export function ProfileSkeleton({ isCollapsed = false }: { isCollapsed?: boolean }) {
+  if (isCollapsed) {
+    return (
+      <div className="w-16 h-screen bg-white border-l border-gray-200 fixed right-0 top-0">
+        <div className="p-4">
+          <Skeleton className="h-12 w-12 rounded-full mx-auto" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-[280px] h-screen bg-white border-l border-gray-200 fixed right-0 top-0">
       <div className="p-6">
