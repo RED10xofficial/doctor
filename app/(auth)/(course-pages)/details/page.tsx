@@ -74,7 +74,7 @@ async function DetailsContent({
 
   return (
     <div className="bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 w-full min-h-screen">
-      <div className="flex gap-4 max-w-screen-2xl mx-auto p-2 pt-4">
+      <div className="flex gap-4 p-4">
         <ErrorBoundary>
           <Suspense fallback={<LoadingState type="content" />}>
             <ClientWrapper 
