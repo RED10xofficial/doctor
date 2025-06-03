@@ -12,7 +12,7 @@ interface PopularUnitsProps {
 }
 
 export default async function PopularUnits({ examType }: PopularUnitsProps) {
-  const popularUnits = await prisma.unit.findMany({
+  const popularUnits = (await prisma.unit.findMany({
     where: {
       section: {
         examType,
@@ -28,13 +28,15 @@ export default async function PopularUnits({ examType }: PopularUnitsProps) {
       exams: true,
       section: true,
     },
-  }) as UnitWithExams[];
+  })) as UnitWithExams[];
+
+  console.log("popularUnits", popularUnits);
 
   return (
     <div className="w-full mt-5">
       <div className="flex justify-between items-center mb-5">
         <h2 className="text-xl font-medium text-gray-800">Popular Units</h2>
-        <Link href="/units" className="text-[#702DFF] text-xs">
+        <Link href="/details" className="text-[#702DFF] text-xs">
           See All
         </Link>
       </div>
@@ -59,7 +61,9 @@ export default async function PopularUnits({ examType }: PopularUnitsProps) {
           >
             <div>
               <h3 className="text-sm font-medium text-gray-800">{unit.name}</h3>
-              <p className="text-xs text-gray-500">Exams: {unit.exams.length}</p>
+              <p className="text-xs text-gray-500">
+                Exams: {unit.exams.length}
+              </p>
             </div>
             <div>
               <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs">
@@ -68,10 +72,10 @@ export default async function PopularUnits({ examType }: PopularUnitsProps) {
             </div>
             <div className="text-right">
               <Link
-                href={`/units/${unit.id}`}
+                href={`/details?currentSection=${unit.sectionId}`}
                 className="px-3 py-1 bg-blue-100 text-blue-600 rounded-lg text-xs"
               >
-                SHOW DETAILS
+                SHOW SECTION
               </Link>
             </div>
           </div>
@@ -79,4 +83,4 @@ export default async function PopularUnits({ examType }: PopularUnitsProps) {
       </div>
     </div>
   );
-} 
+}

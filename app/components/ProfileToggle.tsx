@@ -81,7 +81,7 @@ const ProfileToggle = ({ session, userExams }: ProfileToggleProps) => {
         {/* Greeting Text */}
         <div className="text-center">
           <h3 className="text-[#202020] font-light text-base mb-1.5">
-            Good Morning,
+            Hello,
             <br />
             <span className="font-semibold">{session?.user?.name}</span>
           </h3>

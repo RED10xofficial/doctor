@@ -28,7 +28,7 @@ export default function ExamConfig() {
   } = useForm<ExamFormData>({
     resolver: zodResolver(examSchema),
     defaultValues: {
-      examName: "Your Exam Name",
+      examName: "",
       difficulty: "medium",
       questionCount: 10,
     },
@@ -38,7 +38,11 @@ export default function ExamConfig() {
     setIsLoading(true);
 
     try {
-      const exam = await createCustomExam(data.examName, data.difficulty, data.questionCount);
+      const exam = await createCustomExam(
+        data.examName,
+        data.difficulty,
+        data.questionCount
+      );
       router.push(`/details/exam/${exam.id}`);
     } catch (error) {
       if (error instanceof Error) {
@@ -71,10 +75,12 @@ export default function ExamConfig() {
               id="examName"
               {...register("examName")}
               placeholder="Enter exam name"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              className="mt-1 p-3 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             />
             {errors.examName && (
-              <p className="mt-1 text-sm text-red-600">{errors.examName.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.examName.message}
+              </p>
             )}
           </div>
 
@@ -88,14 +94,16 @@ export default function ExamConfig() {
             <select
               id="difficulty"
               {...register("difficulty")}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              className="mt-1 p-3 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             >
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
             </select>
             {errors.difficulty && (
-              <p className="mt-1 text-sm text-red-600">{errors.difficulty.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.difficulty.message}
+              </p>
             )}
           </div>
 
@@ -112,10 +120,12 @@ export default function ExamConfig() {
               {...register("questionCount", { valueAsNumber: true })}
               min="1"
               max="50"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              className="mt-1 p-3 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             />
             {errors.questionCount && (
-              <p className="mt-1 text-sm text-red-600">{errors.questionCount.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.questionCount.message}
+              </p>
             )}
           </div>
 
