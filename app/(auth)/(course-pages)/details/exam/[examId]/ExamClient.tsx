@@ -163,7 +163,7 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
         title="Exam Instructions"
         backdrop
       >
-        <ExamInstructions onStart={startTimer} />
+        <ExamInstructions instructions={exam.instruction ?? undefined} onStart={startTimer} />
       </Popup>
     </>
   );
