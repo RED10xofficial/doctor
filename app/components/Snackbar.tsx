@@ -32,14 +32,12 @@ interface SnackbarContextProviderProps {
 export const SnackbarProvider: React.FC<SnackbarContextProviderProps> = ({
   children,
 }) => {
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [severity, setSeverity] = useState<"error" | "success">("success");
 
   const showSnackbar = (message: string, severity: "success" | "error") => {
     setMessage(message);
     setSeverity(severity);
-    setSnackbarOpen(true);
   };
 
   return (
@@ -48,7 +46,7 @@ export const SnackbarProvider: React.FC<SnackbarContextProviderProps> = ({
       <Snackbar
         message={message}
         type={severity}
-        onClose={() => setSnackbarOpen(!snackbarOpen)}
+        onClose={() => setMessage(null)}
       />
     </SnackbarContext.Provider>
   );
@@ -72,7 +70,7 @@ export default function Snackbar({ message, type, onClose }: SnackbarProps) {
   }, [onClose]);
 
   return (
-    <div className="fixed top-4 right-2 z-50">
+    <div className="fixed top-4 right-2 z-[99999]">
       {message && (
         <div
           className={`${bgColors[type]} ${textColors[type]} px-6 py-3 rounded-lg shadow-lg
