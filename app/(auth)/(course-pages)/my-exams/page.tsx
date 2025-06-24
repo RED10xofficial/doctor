@@ -18,11 +18,17 @@ const ClientWrapper = dynamic(() => import("./components/ClientWrapper"), {
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 grid grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-4 w-24 bg-gray-200 animate-pulse rounded" />
+              <div
+                key={i}
+                className="h-4 w-24 bg-gray-200 animate-pulse rounded"
+              />
             ))}
           </div>
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="px-6 py-4 border-b border-gray-100 grid grid-cols-4 items-center">
+            <div
+              key={i}
+              className="px-6 py-4 border-b border-gray-100 grid grid-cols-4 items-center"
+            >
               <div className="h-4 w-32 bg-gray-200 animate-pulse rounded" />
               <div className="h-4 w-24 bg-gray-200 animate-pulse rounded" />
               <div className="h-4 w-20 bg-gray-200 animate-pulse rounded" />
@@ -98,7 +104,15 @@ export default function MyExamsPage() {
 
 async function MyExamsContent({ session }: { session: Session }) {
   const attendedExams = await getAttendedExams(parseInt(session.user.id));
-
+  if (attendedExams.length === 0) {
+    return (
+      <div className="flex-1 relative bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-[calc(100vh-6rem)]">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="text-center text-2xl">No exams attended yet</div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flex-1 bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-screen">
       <div className="p-4 space-y-6">

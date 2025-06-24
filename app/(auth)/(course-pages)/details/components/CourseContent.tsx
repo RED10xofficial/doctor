@@ -32,9 +32,19 @@ export default function CourseContent({
   sections,
   initialSectionIndex,
 }: CourseContentProps) {
+  let incommingSectionIndex = 0;
+  incommingSectionIndex = sections.findIndex(
+    (section) => section.id === initialSectionIndex
+  );
+  if (incommingSectionIndex === -1) {
+    incommingSectionIndex = 0;
+  }
+  console.log("sectionIndex", incommingSectionIndex);
+  console.log("initialSectionIndex", initialSectionIndex);
   const [openModules, setOpenModules] = useState(false);
-  const [currentSectionIndex, setCurrentSectionIndex] =
-    useState(initialSectionIndex);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(
+    incommingSectionIndex
+  );
   const [currentUnitIndex, setCurrentUnitIndex] = useState(0);
   const [isExamPopupOpen, setIsExamPopupOpen] = useState(false);
   const [isVideoPopupOpen, setIsVideoPopupOpen] = useState(false);
@@ -59,6 +69,7 @@ export default function CourseContent({
 
   const currentSection = sections[currentSectionIndex];
   const currentUnit = currentSection?.units[currentUnitIndex];
+  console.log("currentUnit", currentUnit);
 
   return (
     <>
@@ -79,7 +90,11 @@ export default function CourseContent({
                 className="text-[#702DFF] bg-transparent border-none outline-none text-sm ms-2"
                 onClick={() => setIsVideoPopupOpen(true)}
               >
-                {`(${currentUnit?.urls?.split(",").length ?? 0} Videos)`}
+                {`(${
+                  currentUnit?.urls
+                    ? currentUnit?.urls?.split(",").length ?? 0
+                    : 0
+                } Videos)`}
               </button>
             </h2>
             <div className="flex items-center">
