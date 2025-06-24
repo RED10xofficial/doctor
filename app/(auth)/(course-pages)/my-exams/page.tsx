@@ -4,6 +4,7 @@ import { Session } from "next-auth";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
+import { ExamScore } from "@prisma/client";
 
 // Dynamically import the client wrapper with loading state
 const ClientWrapper = dynamic(() => import("./components/ClientWrapper"), {
@@ -78,20 +79,31 @@ async function getAttendedExams(studentId: number): Promise<ExamData[]> {
               },
             },
           },
+          examScores: {
+            where: {
+              studentId,
+              submitted: true,
+            }
+          }
         },
       },
     },
     distinct: ["examId"],
   });
 
-  return examScores.map((score) => ({
-    id: score.exam.id.toString(),
-    examName: score.exam.name,
-    unitName: score.exam.unit.name,
-    sectionName: score.exam.unit.section.name,
-    marksScored: score.score,
-    totalMarks: score.exam._count.questions,
-  }));
+  return examScores.map((score) => {
+    const totalPoints = score.exam.examScores
+      .filter((examScore: ExamScore) => examScore.isCorrect)
+      .reduce((sum: number, examScore: ExamScore) => sum + examScore.score, 0);
+    return {
+      id: score.exam.id.toString(),
+      examName: score.exam.name,
+      unitName: score.exam.unit.name,
+      sectionName: score.exam.unit.section.name,
+      marksScored: totalPoints,
+      totalMarks: score.exam._count.questions,
+    }
+  });
 }
 
 export default function MyExamsPage() {
