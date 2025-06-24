@@ -228,10 +228,6 @@ const ProfileToggle = ({ session, userExams }: ProfileToggleProps) => {
       </div>
 
       <div>
-        <button onClick={() => setIsResetModalOpen(true)}>
-          Reset Password
-        </button>
-
         <ResetPasswordModal
           isOpen={isResetModalOpen}
           setIsOpen={setIsResetModalOpen}

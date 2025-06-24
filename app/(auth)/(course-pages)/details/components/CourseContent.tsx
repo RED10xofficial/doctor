@@ -39,8 +39,6 @@ export default function CourseContent({
   if (incommingSectionIndex === -1) {
     incommingSectionIndex = 0;
   }
-  console.log("sectionIndex", incommingSectionIndex);
-  console.log("initialSectionIndex", initialSectionIndex);
   const [openModules, setOpenModules] = useState(false);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(
     incommingSectionIndex
@@ -69,7 +67,6 @@ export default function CourseContent({
 
   const currentSection = sections[currentSectionIndex];
   const currentUnit = currentSection?.units[currentUnitIndex];
-  console.log("currentUnit", currentUnit);
 
   return (
     <>

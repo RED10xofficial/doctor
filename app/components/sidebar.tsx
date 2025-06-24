@@ -110,9 +110,9 @@ const Sidebar = () => {
                 href={"/home"}
                 className="text-[#202020] font-semibold text-lg whitespace-nowrap"
               >
-                <span className="font-extrabold text-transparent text-lg bg-clip-text bg-gradient-to-r from-[#702DFF] via-[#7550FB] to-[#4A3AFF] uppercase">
-                  Study.io
-                </span>
+                <p className="font-extrabold text-transparent text-lg bg-clip-text bg-gradient-to-r from-[#702DFF] via-[#7550FB] to-[#4A3AFF] uppercase">
+                  Study <span className="text-sm block">Catalyst</span>
+                </p>
               </Link>
             )}
           </div>
