@@ -15,7 +15,13 @@ interface AuthError extends Error {
   message: string;
 }
 
-export default function SignupForm() {
+type ExamType = { id: number; name: string };
+
+interface SignupFormProps {
+  examTypes: ExamType[];
+}
+
+export default function SignupForm({ examTypes }: SignupFormProps) {
   const router = useRouter();
   const { showSnackbar } = useSnackbar();
   const [showPasswordInfo, setShowPasswordInfo] = useState(false);
@@ -135,6 +141,34 @@ export default function SignupForm() {
           <p className="text-red-500 text-xs sm:text-sm flex items-center gap-1">
             <span className="w-1 h-1 bg-red-500 rounded-full flex-shrink-0"></span>
             {errors.email.message}
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700">
+          Exam Type
+        </label>
+        <div className="relative">
+          <select
+            {...register("examType", { required: "Exam type is required" })}
+            className="w-full pl-3 pr-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
+            defaultValue=""
+          >
+            <option value="" disabled>
+              Select exam type
+            </option>
+            {examTypes.map((type) => (
+              <option key={type.id} value={type.name}>
+                {type.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        {errors.examType && (
+          <p className="text-red-500 text-xs sm:text-sm flex items-center gap-1">
+            <span className="w-1 h-1 bg-red-500 rounded-full flex-shrink-0"></span>
+            {errors.examType.message}
           </p>
         )}
       </div>
