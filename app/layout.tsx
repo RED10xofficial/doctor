@@ -7,11 +7,11 @@ const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   variable: "--font-poppins",
   display: "swap",
-  subsets: ["latin"]
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Study.io",
+  title: "Learning | Study Catalyst",
   description: "A platform for students to connect and study together",
 };
 
