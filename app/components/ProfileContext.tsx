@@ -10,17 +10,18 @@ interface ProfileContextType {
 }
 
 const ProfileContext = createContext<ProfileContextType>({
-  isProfileExpanded: true,
+  isProfileExpanded: false,
   setIsProfileExpanded: () => {},
-  isSideMenuExpanded: true,
+  isSideMenuExpanded: false,
   setIsSideMenuExpanded: () => {},
 });
 
 export const useProfile = () => useContext(ProfileContext);
 
 export function ProfileProvider({ children }: { children: React.ReactNode }) {
-  const [isProfileExpanded, setIsProfileExpanded] = useState(true);
-  const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(true);
+  // Start with collapsed state to prevent issues
+  const [isProfileExpanded, setIsProfileExpanded] = useState(false);
+  const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
 
   // Update document attribute for CSS targeting
   useEffect(() => {

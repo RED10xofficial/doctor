@@ -26,12 +26,14 @@ export default async function Stats({ examType }: StatsProps) {
 
   return (
     <div className="w-full grid grid-cols-3 gap-3">
-      <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between">
+      <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between relative">
         <div className="flex-grow">
-          <div className="text-3xl font-normal text-gray-700">{sectionsCount}</div>
+          <div className="text-3xl font-normal text-gray-700">
+            {sectionsCount}
+          </div>
           <div className="text-sm text-gray-600">Sections</div>
         </div>
-        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center absolute right-2 top-2 md:relative md:top-0 md:translate-y-0">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5 text-purple-700"
@@ -49,12 +51,12 @@ export default async function Stats({ examType }: StatsProps) {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between">
+      <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between relative">
         <div className="flex-grow">
           <div className="text-3xl font-normal text-gray-700">{unitsCount}</div>
           <div className="text-sm text-gray-600">Units</div>
         </div>
-        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center absolute right-2 top-2 md:relative md:top-0 md:translate-y-0">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5 text-purple-700"
@@ -72,12 +74,12 @@ export default async function Stats({ examType }: StatsProps) {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between">
+      <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between relative">
         <div className="flex-grow">
           <div className="text-3xl font-normal text-gray-700">{examsCount}</div>
           <div className="text-sm text-gray-600">Exams</div>
         </div>
-        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center absolute right-2 top-2 md:relative md:top-0 md:translate-y-0">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5 text-purple-700"
@@ -96,4 +98,4 @@ export default async function Stats({ examType }: StatsProps) {
       </div>
     </div>
   );
-} 
+}
