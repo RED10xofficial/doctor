@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Popup from "@/app/components/popup";
 import ExamInstructions from "../../components/examInstructions";
 import { useSnackbar } from "@/app/components/Snackbar";
-import { Option } from '@prisma/client';
+import { Option } from "@prisma/client";
 import { submitAnswer, submitExam } from "../actions";
 
 interface Question {
@@ -82,7 +82,7 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
         score: 1,
       });
     } catch (error) {
-      console.error('Error submitting answer:', error);
+      console.error("Error submitting answer:", error);
       showSnackbar("Failed to submit answer", "error");
     }
   };
@@ -120,7 +120,9 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
               const question = questionExam.question;
               return (
                 <div key={question.id} className="bg-white rounded-lg p-4">
-                  <h2 className="text-lg font-semibold">Question {index + 1}</h2>
+                  <h2 className="text-lg font-semibold">
+                    Question {index + 1}
+                  </h2>
                   <p className="text-gray-500">{question.question}</p>
                   <div className="mt-4">
                     {question.options.map((option: Option) => (
@@ -130,7 +132,11 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
                           name={`question-${question.id}`}
                           id={`option-${option.id}`}
                           onChange={() => {
-                            handleAnswerQuestion(question.id, option.optionKey, option.id);
+                            handleAnswerQuestion(
+                              question.id,
+                              option.optionKey,
+                              option.id
+                            );
                           }}
                         />
                         <label
@@ -161,10 +167,14 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
         isOpen={isOpen}
         setIsOpen={closeExam}
         title="Exam Instructions"
+        className="max-w-md"
         backdrop
       >
-        <ExamInstructions instructions={exam.instruction ?? undefined} onStart={startTimer} />
+        <ExamInstructions
+          instructions={exam.instruction ?? undefined}
+          onStart={startTimer}
+        />
       </Popup>
     </>
   );
-} 
+}

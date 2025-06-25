@@ -54,6 +54,7 @@ export default function CourseContent({
     (sectionIndex: number, unitIndex: number) => {
       setCurrentSectionIndex(sectionIndex);
       setCurrentUnitIndex(unitIndex);
+      setOpenModules(false);
 
       // Update URL without full page reload
       if (searchParams) {
@@ -78,21 +79,40 @@ export default function CourseContent({
           currentUnit={currentUnitIndex}
         />
       </div>
-      <div className="flex-1 bg-white rounded-lg p-6 shadow-md">
-        <div className="flex justify-between items-start mb-6">
+      <div className="bg-white rounded-lg p-6 shadow-md w-full">
+        <div className="block md:flex justify-between items-start mb-6 gap-2">
+          <div className="flex justify-end md:hidden gap-2 mb-2">
+            <button
+              type="button"
+              className="bg-[#702DFF] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#5924cc] transition-colors font-medium"
+              onClick={() => setIsExamPopupOpen(true)}
+            >
+              Exams
+            </button>
+            <button
+              type="button"
+              className="block md:hidden bg-[rgba(112,45,255,0.2)] text-[#702DFF] px-3 py-2 rounded-lg text-sm hover:bg-[rgba(112,45,255,0.3)] transition-colors"
+              onClick={() => setOpenModules(!openModules)}
+              title="Modules"
+            >
+              <AlignRightIcon className="w-4 h-4" />
+            </button>
+          </div>
           <div>
-            <h2 className="text-2xl font-bold text-[#202020] capitalize mb-2">
+            <h2 className="text-xl md:text-2xl font-bold text-[#202020] capitalize mb-2">
               {currentUnit?.name}
-              <button
-                className="text-[#702DFF] bg-transparent border-none outline-none text-sm ms-2"
-                onClick={() => setIsVideoPopupOpen(true)}
-              >
-                {`(${
-                  currentUnit?.urls
-                    ? currentUnit?.urls?.split(",").length ?? 0
-                    : 0
-                } Videos)`}
-              </button>
+              {currentUnit?.urls && (
+                <button
+                  className="text-[#702DFF] bg-transparent border-none outline-none text-sm ms-2"
+                  onClick={() => setIsVideoPopupOpen(true)}
+                >
+                  {`(${
+                    currentUnit?.urls
+                      ? currentUnit?.urls?.split(",").length ?? 0
+                      : 0
+                  } Videos)`}
+                </button>
+              )}
             </h2>
             <div className="flex items-center">
               <BookOpenIcon className="w-4 h-4 text-[#702DFF]" />
@@ -109,7 +129,7 @@ export default function CourseContent({
               )} */}
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="hidden md:flex gap-2">
             <button
               type="button"
               className="bg-[#702DFF] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#5924cc] transition-colors font-medium"
@@ -153,6 +173,21 @@ export default function CourseContent({
           className="max-w-3xl"
         >
           <VideoList videos={currentUnit?.urls ?? ""} />
+        </Popup>
+
+        {/* Mobile Modules Popup */}
+        <Popup
+          isOpen={openModules}
+          setIsOpen={setOpenModules}
+          title=""
+          className="max-w-md"
+        >
+          <Modules
+            sections={sections}
+            setCurrentIndex={setCurrentIndex}
+            currentSection={currentSectionIndex}
+            currentUnit={currentUnitIndex}
+          />
         </Popup>
       </div>
     </>

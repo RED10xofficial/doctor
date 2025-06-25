@@ -60,20 +60,22 @@ export default async function PopularUnits({ examType }: PopularUnitsProps) {
             className="px-6 py-4 border-b border-gray-100 grid grid-cols-3 items-center"
           >
             <div>
-              <h3 className="text-sm font-medium text-gray-800">{unit.name}</h3>
+              <h3 className="text-sm font-medium text-gray-800 break-all">
+                {unit.name}
+              </h3>
               <p className="text-xs text-gray-500">
                 Exams: {unit.exams.length}
               </p>
             </div>
-            <div>
+            <div className="text-center md:text-left md:ml-4">
               <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs">
                 {unit.section.name}
               </span>
             </div>
-            <div className="text-right">
+            <div className="text-center md:text-right">
               <Link
                 href={`/details?currentSection=${unit.sectionId}`}
-                className="px-3 py-1 bg-blue-100 text-blue-600 rounded-lg text-xs"
+                className="px-3 py-1 bg-blue-100 text-blue-600 rounded-lg text-xs block md:inline-block"
               >
                 SHOW SECTION
               </Link>

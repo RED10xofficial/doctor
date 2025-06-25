@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useProfile } from "./ProfileContext";
 
 export function CourseLayoutProvider({
@@ -14,12 +14,29 @@ export function CourseLayoutProvider({
     isSideMenuExpanded,
     setIsSideMenuExpanded,
   } = useProfile();
+  const [isMounted, setIsMounted] = useState(false);
 
-  // Immediately set the profile to collapsed on mount
   useEffect(() => {
-    setIsProfileExpanded(false);
-    setIsSideMenuExpanded(false);
-  }, []); // Run only on mount
+    setIsMounted(true);
+  }, []);
+
+  // Set the profile and sidebar to collapsed for course pages
+  useEffect(() => {
+    if (!isMounted) return;
+
+    const timer = setTimeout(() => {
+      const isMobile = window.innerWidth < 768;
+
+      if (!isMobile) {
+        // Only set collapsed state on desktop for course pages
+        setIsProfileExpanded(false);
+        setIsSideMenuExpanded(false);
+      }
+      // On mobile, don't override - they should stay collapsed by default
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [setIsProfileExpanded, setIsSideMenuExpanded, isMounted]);
 
   // Update document attribute for CSS targeting
   useEffect(() => {
