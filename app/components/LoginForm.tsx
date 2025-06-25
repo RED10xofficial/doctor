@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useSnackbar } from "@/app/components/Snackbar";
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { redirect } from "next/navigation";
 
 type FormData = {
   email: string;
@@ -28,19 +29,23 @@ export default function LoginForm() {
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    try {
-      await signIn("credentials", {
-        redirect: true,
-        email: data.email,
-        password: data.password,
-        callbackUrl: "/home",
-      });
-    } catch (error) {
-      const authError = error as AuthError;
-      showSnackbar(authError.message || "Something went wrong", "error");
-    } finally {
-      setIsLoading(false);
+    
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: data.email,
+      password: data.password,
+    });
+
+    if (result?.error) {
+      showSnackbar(result.error, "error");
+    } else if (result?.ok) {
+      // Successful login - redirect to home
+      redirect('/home')
+    } else {
+      showSnackbar("Something went wrong", "error");
     }
+    
+    setIsLoading(false);
   };
 
   return (

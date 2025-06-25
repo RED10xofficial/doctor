@@ -30,8 +30,6 @@ export default async function PopularUnits({ examType }: PopularUnitsProps) {
     },
   })) as UnitWithExams[];
 
-  console.log("popularUnits", popularUnits);
-
   return (
     <div className="w-full mt-5">
       <div className="flex justify-between items-center mb-5">

@@ -17,20 +17,11 @@ export default async function handler(
       const session = await getServerSession(req, res, authOptions);
 
       if (!session || !session.user) {
-        console.log("No session found");
         return res
           .status(401)
           .json({ success: false, message: "Unauthorized" });
       }
-
-      console.log("Session found for user:", session.user.email);
       const { oldPassword, newPassword } = req.body;
-      console.log(
-        "Request body parsed, oldPassword:",
-        !!oldPassword,
-        "newPassword:",
-        !!newPassword
-      );
 
       // Validate input
       if (!oldPassword || !newPassword) {
