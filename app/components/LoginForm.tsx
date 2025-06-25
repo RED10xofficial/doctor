@@ -12,9 +12,6 @@ type FormData = {
   password: string;
 };
 
-interface AuthError extends Error {
-  message: string;
-}
 
 export default function LoginForm() {
   const { showSnackbar } = useSnackbar();
