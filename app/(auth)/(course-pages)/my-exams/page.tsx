@@ -4,7 +4,6 @@ import { Session } from "next-auth";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
-import { ExamScore } from "@prisma/client";
 
 // Dynamically import the client wrapper with loading state
 const ClientWrapper = dynamic(() => import("./components/ClientWrapper"), {
@@ -44,66 +43,28 @@ const ClientWrapper = dynamic(() => import("./components/ClientWrapper"), {
 
 type ExamData = {
   id: string;
-  examName: string;
+  name: string;
   unitName: string;
   sectionName: string;
   marksScored: number;
   totalMarks: number;
 };
 
-async function getAttendedExams(studentId: number): Promise<ExamData[]> {
-  const examScores = await prisma.examScore.findMany({
-    where: {
-      studentId,
-      submitted: true,
-    },
-    select: {
-      examId: true,
-      score: true,
-      exam: {
-        select: {
-          id: true,
-          name: true,
-          _count: {
-            select: {
-              questions: true,
-            },
-          },
-          unit: {
-            select: {
-              name: true,
-              section: {
-                select: {
-                  name: true,
-                },
-              },
-            },
-          },
-          examScores: {
-            where: {
-              studentId,
-              submitted: true,
-            }
-          }
-        },
-      },
-    },
-    distinct: ["examId"],
-  });
-
-  return examScores.map((score) => {
-    const totalPoints = score.exam.examScores
-      .filter((examScore: ExamScore) => examScore.isCorrect)
-      .reduce((sum: number, examScore: ExamScore) => sum + examScore.score, 0);
-    return {
-      id: score.exam.id.toString(),
-      examName: score.exam.name,
-      unitName: score.exam.unit.name,
-      sectionName: score.exam.unit.section.name,
-      marksScored: totalPoints,
-      totalMarks: score.exam._count.questions,
-    }
-  });
+async function getAttendedExams(
+  studentId: string,
+  token?: string
+): Promise<ExamData[]> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_REST_URL}/auth/students/${studentId}/exams`,
+      { headers: { token: token as string } }
+    );
+    const { data } = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching user exams:", error);
+    return [];
+  }
 }
 
 export default function MyExamsPage() {
@@ -115,7 +76,10 @@ export default function MyExamsPage() {
 }
 
 async function MyExamsContent({ session }: { session: Session }) {
-  const attendedExams = await getAttendedExams(parseInt(session.user.id));
+  const attendedExams = await getAttendedExams(
+    session?.user?.id as string,
+    session?.accessToken
+  );
   if (attendedExams.length === 0) {
     return (
       <div className="flex-1 relative bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-[calc(100vh-6rem)]">

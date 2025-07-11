@@ -2,7 +2,7 @@ import Link from "next/link";
 
 interface Exam {
   id: string;
-  examName: string;
+  name: string;
   unitName: string;
   sectionName: string;
   marksScored: number;
@@ -40,7 +40,7 @@ export default function ClientWrapper({ exams }: ClientWrapperProps) {
           >
             <div className="p-6">
               <h2 className="text-[#202020] font-semibold text-lg mb-4">
-                {exam.examName}
+                {exam.name}
               </h2>
 
               <div className="space-y-3 mb-5">

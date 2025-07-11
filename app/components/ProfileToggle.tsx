@@ -12,7 +12,8 @@ import ResetPasswordModal from "./ResetPasswordModal";
 interface Exam {
   id: number;
   name: string;
-  score: string;
+  marksScored: number;
+  totalMarks: number
 }
 
 // Props for the component
@@ -215,7 +216,7 @@ const ProfileToggle = ({ session, userExams }: ProfileToggleProps) => {
                           {exam.name}
                         </Link>
                         <span className="text-[#702DFF] font-bold text-[12px]">
-                          {exam.score}
+                          {exam.marksScored} / {exam.totalMarks}
                         </span>
                       </div>
                     </div>
@@ -427,7 +428,7 @@ const ProfileToggle = ({ session, userExams }: ProfileToggleProps) => {
                         {exam.name}
                       </Link>
                       <span className="text-[#702DFF] font-bold text-[12px]">
-                        {exam.score}
+                        {exam.marksScored} / {exam.totalMarks}
                       </span>
                     </div>
                   </div>
