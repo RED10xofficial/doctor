@@ -1,9 +1,6 @@
 // pages/api/auth/[...nextauth].ts
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import bcrypt from "bcryptjs";
 import NextAuth, { Session, SessionStrategy, User } from "next-auth";
-import prisma from "@/lib/prisma";
 import { JWT } from "next-auth/jwt";
 
 interface CustomSessionUser {
@@ -16,10 +13,10 @@ interface CustomSessionUser {
 
 interface CustomSession extends Session {
   user: CustomSessionUser;
+  accessToken?: string;
 }
 
 export const authOptions = {
-  adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -31,44 +28,42 @@ export const authOptions = {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-
-        // Find the user by username or email
-        const user = await prisma.student.findUnique({
-          where: { email: credentials.email },
+        // Call your REST API to verify credentials
+        const res = await fetch(`${process.env.NEXT_PUBLIC_REST_URL}/students/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+          }),
         });
-
-        // If the user exists and the password matches, return the user
-        if (
-          user?.password &&
-          bcrypt.compareSync(credentials.password, user.password)
-        ) {
+        const { data } = await res.json();
+        if (res.ok && data) {
+          // Attach the token to the user object
           return {
-            id: user.id.toString(),
-            username: user.email,
-            name: user.name,
-            image: user.image,
-            email: user.email,
-            examType: user.examType,
+            ...data.student,
+            token: data.token, // if your API returns a JWT or similar
           };
-        } else {
-          throw Error("Incorrect email / password");
         }
+        // Return null if authentication fails
+        return null;
       },
-    }),
+    })
   ],
-
   session: {
     strategy: "jwt" as SessionStrategy, // Store session as JWT
   },
-
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user: User }) {
+    async jwt({ token, user }: { token: JWT; user: any }) {
+      // Persist the token from your API to the JWT
       if (user) {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
-        // @ts-expect-error - ExamType is not a standard property on the User object
         token.examType = user.examType;
+        if (user.token) {
+          token.accessToken = user.token;
+        }
       }
       return token;
     },
@@ -79,9 +74,13 @@ export const authOptions = {
         email: token.email as string,
         examType: token.examType as string,
       };
+      if (token.accessToken) {
+        session.accessToken = token.accessToken as string;
+      }
       return session;
     },
   },
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 export default NextAuth(authOptions);

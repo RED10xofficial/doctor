@@ -15,7 +15,7 @@ interface AuthError extends Error {
   message: string;
 }
 
-type ExamType = { id: number; name: string };
+type ExamType = { id: number; name: string, slug: string };
 
 interface SignupFormProps {
   examTypes: ExamType[];
@@ -43,7 +43,10 @@ export default function SignupForm({ examTypes }: SignupFormProps) {
   const onSubmit = async (formData: FormData) => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/signup", {
+      if (formData.confirmPassword) {
+        delete formData.confirmPassword;
+      }
+      const response = await fetch(`${process.env.NEXT_PUBLIC_REST_URL}/students`, {
         method: "POST",
         body: JSON.stringify(formData),
       });
@@ -159,7 +162,7 @@ export default function SignupForm({ examTypes }: SignupFormProps) {
               Select exam type
             </option>
             {examTypes.map((type) => (
-              <option key={type.id} value={type.name}>
+              <option key={type.id} value={type.slug}>
                 {type.name}
               </option>
             ))}

@@ -1,11 +1,11 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useSnackbar } from "@/app/components/Snackbar";
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { redirect } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 type FormData = {
   email: string;
@@ -17,6 +17,7 @@ export default function LoginForm() {
   const { showSnackbar } = useSnackbar();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -26,23 +27,22 @@ export default function LoginForm() {
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    
-    const result = await signIn("credentials", {
-      redirect: false,
-      email: data.email,
-      password: data.password,
-    });
-
-    if (result?.error) {
-      showSnackbar(result.error, "error");
-    } else if (result?.ok) {
-      // Successful login - redirect to home
-      redirect('/home')
-    } else {
-      showSnackbar("Something went wrong", "error");
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
+      if (result?.error) {
+        showSnackbar(result.error, "error");
+      } else if (result?.ok) {
+        router.push("/home");
+      } else {
+        showSnackbar("Something went wrong", "error");
+      }
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   return (

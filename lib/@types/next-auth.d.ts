@@ -8,6 +8,7 @@ declare module "next-auth" {
       name: string,
       examType: string
     };
+    accessToken?: string
   }
   interface JWT extends DefaultJWT {
     id: string;

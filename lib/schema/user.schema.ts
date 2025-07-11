@@ -8,7 +8,8 @@ export const userSchema = z
     examType: z.string().min(1, "Exam type is required"),
     confirmPassword: z
       .string()
-      .min(8, "Password confirmation must be at least 8 characters long"),
+      .min(8, "Password confirmation must be at least 8 characters long")
+      .optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
