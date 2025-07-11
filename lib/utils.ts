@@ -8,6 +8,6 @@ export function cn(...inputs: ClassValue[]) {
 export const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export async function getAllExamTypes() {
-  const res = await fetcher(`${process.env.NEXT_PUBLIC_REST_URL}/examtypes`);
-  return res.data
+  const {data} = await fetcher(`${process.env.NEXT_PUBLIC_REST_URL}/examtypes`);
+  return data
 }
