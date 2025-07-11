@@ -3,8 +3,9 @@ import prisma from "@/lib/prisma";
 import { Unit, Exam, Section } from "@prisma/client";
 
 type UnitWithExams = Unit & {
+  examCount: number;
   exams: Exam[];
-  section: Section;
+  sections: Section;
 };
 
 interface PopularUnitsProps {
@@ -12,23 +13,28 @@ interface PopularUnitsProps {
 }
 
 export default async function PopularUnits({ examType }: PopularUnitsProps) {
-  const popularUnits = (await prisma.unit.findMany({
-    where: {
-      section: {
-        examType,
-      },
-    },
-    take: 5,
-    orderBy: {
-      exams: {
-        _count: "desc",
-      },
-    },
-    include: {
-      exams: true,
-      section: true,
-    },
-  })) as UnitWithExams[];
+  // const popularUnits = (await prisma.unit.findMany({
+  //   where: {
+  //     section: {
+  //       examType,
+  //     },
+  //   },
+  //   take: 5,
+  //   orderBy: {
+  //     exams: {
+  //       _count: "desc",
+  //     },
+  //   },
+  //   include: {
+  //     exams: true,
+  //     section: true,
+  //   },
+  // })) as UnitWithExams[];
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_REST_URL}/units?limit=5`)
+  const {data} = await res.json()
+
+  const popularUnits = data as UnitWithExams[]
 
   return (
     <div className="w-full mt-5">
@@ -62,12 +68,12 @@ export default async function PopularUnits({ examType }: PopularUnitsProps) {
                 {unit.name}
               </h3>
               <p className="text-xs text-gray-500">
-                Exams: {unit.exams.length}
+                Exams: {unit.examCount}
               </p>
             </div>
             <div className="text-center md:text-left md:ml-4">
               <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs">
-                {unit.section.name}
+                {unit.sections.name}
               </span>
             </div>
             <div className="text-center md:text-right">

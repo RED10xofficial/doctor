@@ -1,7 +1,5 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import prisma from "@/lib/prisma";
-import { ExamScore } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import LoadingState from "@/app/components/LoadingState";
@@ -29,46 +27,33 @@ async function ExamResultContent({
   params: Promise<{ examId: string }>;
 }) {
   const resolvedParams = await params;
-  const examId = parseInt(resolvedParams.examId);
-  const studentId = parseInt(session.user.id);
+  const examId = resolvedParams.examId;
+  const studentId = session.user.id;
 
   if (!examId) {
     redirect("/my-exams");
   }
 
-  // Fetch exam data
-  const exam = await prisma.exam.findUnique({
-    where: { id: examId },
-    include: {
-      questions: {
-        include: {
-          question: true,
-        },
-      },
-      examScores: {
-        where: {
-          studentId,
-          submitted: true,
-        },
-      },
-    },
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_REST_URL}/auth/students/${studentId}/exams/${examId}`,
+    { headers: { token: session.accessToken as string } }
+  );
 
-  if (!exam) {
+  const {data} = await res.json()
+
+  if (!data) {
     redirect("/my-exams");
   }
 
   // Check if exam has been attempted
-  const hasAttempted = exam.examScores.length > 0;
+  const hasAttempted = data;
   if (!hasAttempted) {
-    redirect(`/details/exam/${examId}`);
+    redirect(`/my-exams`);
   }
 
   // Calculate exam statistics
-  const totalQuestions = exam.questions.length;
-  const correctAnswers = exam.examScores.filter(
-    (score: ExamScore) => score.isCorrect
-  ).length;
+  const totalQuestions = data.questionCount;
+  const correctAnswers = data.marksScored;
   const percentage = Math.round((correctAnswers / totalQuestions) * 100);
   const isPassed = percentage >= 40; // Assuming 40% is passing score
 

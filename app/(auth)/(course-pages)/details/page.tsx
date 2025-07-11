@@ -72,13 +72,18 @@ async function DetailsContent({
     }
   }) as SectionWithUnits[];
 
+  const res = await fetch(`${process.env.NEXT_PUBLIC_REST_URL}/sections?examType=${session.user.examType}`)
+  const {data} = await res.json();
+
+
+
   return (
     <div className="bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 w-full min-h-screen">
       <div className="flex gap-4 p-4">
         <ErrorBoundary>
           <Suspense fallback={<LoadingState type="content" />}>
             <ClientWrapper 
-              sections={sections} 
+              sections={data} 
               initialSectionIndex={currentSectionIndex}
             />
           </Suspense>

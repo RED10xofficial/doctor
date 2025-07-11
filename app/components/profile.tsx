@@ -26,9 +26,6 @@ async function getUserExams(userId: string, token?: string) {
 const ProfileSidebar = async () => {
   const session = await auth();
   const userId = session?.user?.id;
-
-  console.log(userId, 'user')
-
   // Get user's exams if logged in
   const userExams = userId ? await getUserExams(userId, session?.accessToken) : [];
 

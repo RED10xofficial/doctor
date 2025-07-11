@@ -12,8 +12,8 @@ interface ExamStatistics {
   unitId: number;
   instruction?: string;
   duration: number;
-  totalPoints: number;
-  maxPoints: number;
+  totalMarks: number;
+  marksScored: number;
   questions: {
     [questionId: number]: {
       id: number;
@@ -126,14 +126,14 @@ export default function ClientWrapper({ examData }: ClientWrapperProps) {
               cy="40"
               strokeDasharray={201.06} // 2 * π * r
               strokeDashoffset={
-                201.06 - 201.06 * (examData.totalPoints / examData.maxPoints)
+                201.06 - 201.06 * (examData.marksScored / examData.totalMarks)
               }
               strokeLinecap="round"
             />
           </svg>
           <span className="absolute text-gray-700 text-sm">
-            <span className="font-semibold text-2xl">{examData.totalPoints}</span>
-            <span className="text-sm">/{examData.maxPoints}</span>
+            <span className="font-semibold text-2xl">{examData.marksScored}</span>
+            <span className="text-sm">/{examData.totalMarks}</span>
           </span>
         </div>
       </div>

@@ -74,106 +74,26 @@ async function DetailedResultContent({
   params: Promise<{ examId: string }>;
 }) {
   const resolvedParams = await params;
-  const examId = parseInt(resolvedParams.examId);
-  const studentId = parseInt(session.user.id);
+  const examId = resolvedParams.examId;
+  const studentId = session.user.id;
 
-  // Fetch exam with questions, options, and statistics
-  const exam = (await prisma.exam.findUnique({
-    where: { id: examId },
-    include: {
-      questions: {
-        include: {
-          question: {
-            include: {
-              options: true,
-              examScores: {
-                where: {
-                  studentId,
-                  examId,
-                },
-              },
-            },
-          },
-        },
-      },
-      examScores: {
-        where: {
-          studentId,
-          examId,
-        },
-      },
-    },
-  })) as ExamWithRelations | null;
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_REST_URL}/auth/students/${studentId}/exams/${examId}`,
+    { headers: { token: session.accessToken as string } }
+  );
 
-  if (!exam) {
+  const {data} = await res.json()
+
+  if (!data) {
     redirect("/details");
   }
-
-  // Calculate statistics
-  const questions: ExamStatistics["questions"] = exam.questions.reduce(
-    (acc: ExamStatistics["questions"], questionExam) => {
-      const question = questionExam.question;
-      acc[question.id] = {
-        id: question.id,
-        question: question.question,
-        options: question.options.map((option: Option) => ({
-          ...option,
-          correctAnswer: option.optionKey === question.answer,
-        })),
-      };
-
-      return acc;
-    },
-    {} as ExamStatistics["questions"]
-  );
-
-  const data: ExamStatistics["data"] = exam.questions.reduce(
-    (acc: ExamStatistics["data"], questionExam) => {
-      const question = questionExam.question;
-      const correctAnswers = question.examScores.filter(
-        (score: ExamScore) => score.isCorrect
-      ).length;
-      const incorrectAnswers = question.examScores.filter(
-        (score: ExamScore) => !score.isCorrect
-      ).length;
-      const isCorrect = question.examScores.some(
-        (score: ExamScore) => score.isCorrect
-      );
-
-      acc[question.id] = {
-        totalCorrect: correctAnswers,
-        totalInCorrect: incorrectAnswers,
-        isCorrect,
-      };
-
-      return acc;
-    },
-    {} as ExamStatistics["data"]
-  );
-
-  const totalPoints = exam.examScores
-    .filter((score: ExamScore) => score.isCorrect)
-    .reduce((sum: number, score: ExamScore) => sum + score.score, 0);
-  const maxPoints = exam.questions.length;
-
-  const examData: ExamStatistics = {
-    id: exam.id,
-    name: exam.name,
-    unitId: exam.unitId,
-    instruction: exam.instruction || undefined,
-    duration: exam.duration,
-    totalPoints,
-    maxPoints,
-    questions,
-    data,
-  };
 
   return (
     <div className="flex-1 bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-screen">
       <div className="space-y-6 bg-white rounded-xl p-4 shadow-sm">
         <ErrorBoundary>
           <Suspense fallback={<LoadingState />}>
-            <ClientWrapper examData={examData} />
+            <ClientWrapper examData={data} />
           </Suspense>
         </ErrorBoundary>
       </div>

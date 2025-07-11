@@ -6,30 +6,16 @@ interface StatsProps {
 
 export default async function Stats({ examType }: StatsProps) {
   // Fetch all stats in parallel
-  const [sectionsCount, unitsCount, examsCount] = await Promise.all([
-    prisma.section.count({
-      where: { examType },
-    }),
-    prisma.unit.count({
-      where: {
-        section: { examType },
-      },
-    }),
-    prisma.exam.count({
-      where: {
-        unit: {
-          section: { examType },
-        },
-      },
-    }),
-  ]);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_REST_URL}/stats/${examType}`);
+  const { data } = await res.json();
+
 
   return (
     <div className="w-full grid grid-cols-3 gap-3">
       <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between relative">
         <div className="flex-grow">
           <div className="text-3xl font-normal text-gray-700">
-            {sectionsCount}
+            {data.sections}
           </div>
           <div className="text-sm text-gray-600">Sections</div>
         </div>
@@ -53,7 +39,7 @@ export default async function Stats({ examType }: StatsProps) {
 
       <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between relative">
         <div className="flex-grow">
-          <div className="text-3xl font-normal text-gray-700">{unitsCount}</div>
+          <div className="text-3xl font-normal text-gray-700">{data.units}</div>
           <div className="text-sm text-gray-600">Units</div>
         </div>
         <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center absolute right-2 top-2 md:relative md:top-0 md:translate-y-0">
@@ -76,7 +62,7 @@ export default async function Stats({ examType }: StatsProps) {
 
       <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between relative">
         <div className="flex-grow">
-          <div className="text-3xl font-normal text-gray-700">{examsCount}</div>
+          <div className="text-3xl font-normal text-gray-700">{data.exams}</div>
           <div className="text-sm text-gray-600">Exams</div>
         </div>
         <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center absolute right-2 top-2 md:relative md:top-0 md:translate-y-0">
