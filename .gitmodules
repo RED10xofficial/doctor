@@ -1,0 +1,3 @@
+[submodule "prisma"]
+	path = prisma
+	url = git@github.com:mahi30795/study-io-prisma-schema.git

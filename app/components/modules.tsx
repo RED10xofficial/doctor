@@ -1,95 +1,124 @@
-'use client';
-import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
+"use client";
 import { ChevronUpIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
-export default function Modules() {
-    const items = [
-        {
-          section: "Automotive",
-          units: [
-            { unitName: "Tires", smallDescription: "High-performance tires for your vehicle" },
-            { unitName: "Brakes", smallDescription: "Reliable braking system components" },
-            { unitName: "Engine Oil", smallDescription: "Premium engine lubricants" },
-            { unitName: "Windshield Wipers", smallDescription: "Durable and effective wiper blades" },
-            { unitName: "Car Batteries", smallDescription: "Long-lasting automotive batteries" },
-            { unitName: "Spark Plugs", smallDescription: "Optimized ignition components" },
-            { unitName: "Air Filters", smallDescription: "Improve engine performance" },
-            { unitName: "Headlights", smallDescription: "Bright and energy-efficient lighting" },
-            { unitName: "Wheel Alignment", smallDescription: "Ensure proper wheel positioning" },
-            { unitName: "Coolant", smallDescription: "Prevent engine overheating" },
-            { unitName: "Fuel Injectors", smallDescription: "Enhance fuel efficiency" },
-            { unitName: "Shock Absorbers", smallDescription: "Smooth ride quality" }
-          ]
-        },
-        {
-          section: "Electronics",
-          units: [
-            { unitName: "Smartphones", smallDescription: "Latest models with advanced features" },
-            { unitName: "Laptops", smallDescription: "Powerful and portable computing solutions" },
-            { unitName: "Televisions", smallDescription: "Immersive home entertainment experience" },
-            { unitName: "Headphones", smallDescription: "High-quality audio for music enthusiasts" },
-            { unitName: "Cameras", smallDescription: "Capture stunning photos and videos" },
-            { unitName: "Tablets", smallDescription: "Versatile and portable computing devices" },
-            { unitName: "Smartwatches", smallDescription: "Seamless integration with your smartphone" },
-            { unitName: "Gaming Consoles", smallDescription: "Immersive gaming experiences" },
-            { unitName: "Speakers", smallDescription: "Powerful and immersive audio systems" },
-            { unitName: "Drones", smallDescription: "Aerial photography and videography" },
-            { unitName: "Fitness Trackers", smallDescription: "Monitor your health and activity" },
-            { unitName: "Smart Home Devices", smallDescription: "Automate and control your home" }
-          ]
-        },
-        {
-          section: "Home Improvement",
-          units: [
-            { unitName: "Power Tools", smallDescription: "Efficient and durable tools for DIY projects" },
-            { unitName: "Hand Tools", smallDescription: "Essential tools for home maintenance" },
-            { unitName: "Plumbing Supplies", smallDescription: "Reliable plumbing components" },
-            { unitName: "Lighting Fixtures", smallDescription: "Enhance the ambiance of your home" },
-            { unitName: "Paint and Stains", smallDescription: "Transform the look of your spaces" },
-            { unitName: "Flooring", smallDescription: "Durable and stylish flooring options" },
-            { unitName: "Gardening Tools", smallDescription: "Maintain a beautiful outdoor space" },
-            { unitName: "Insulation", smallDescription: "Improve energy efficiency and comfort" },
-            { unitName: "Windows and Doors", smallDescription: "Enhance the curb appeal of your home" },
-            { unitName: "Roofing Supplies", smallDescription: "Protect your home from the elements" },
-            { unitName: "Electrical Supplies", smallDescription: "Ensure safe and reliable electrical systems" },
-            { unitName: "Appliances", smallDescription: "Upgrade your home with modern appliances" }
-          ]
-        },
-        // 17 more sections with random names and units
-      ];
-    return (
-        <div className="sticky top-[30px] h-[calc(100vh-30px)] bg-white shadow-lg mb-8 rounded-lg">
-            <div className=" p-4  max-h-full overflow-y-auto overflow-x-hidden ">
-                <div className="w-[300px] space-y-2">
-                    <div className="text-xl font-semibold mb-4">Course Modules</div>
-                    {items.map((section, index) => (
-                      <Disclosure key={index} as="div">
-                        {({ open }) => (
-                          <>
-                            <DisclosureButton className="flex w-full justify-between rounded-lg bg-gray-200 px-4 py-2 text-left text-sm font-medium text-gray-900 hover:bg-sky-200 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75">
-                              <span>{section.section}</span>
-                              <ChevronUpIcon
-                                className={`${
-                                  open ? 'rotate-180 transform' : ''
-                                } h-5 w-5 text-gray-500`}
-                              />
-                            </DisclosureButton>
-                            <DisclosurePanel className="px-4 pt-2 pb-2 text-sm text-gray-500">
-                              <div className="space-y-2">
-                                {section.units.map((unit, unitIndex) => (
-                                  <div key={unitIndex} className="cursor-pointer hover:bg-gray-50 p-2 rounded">
-                                    <div className="font-medium text-gray-900">{unit.unitName}</div>
-                                    <div className="text-xs text-gray-500">{unit.smallDescription}</div>
-                                  </div>
-                                ))}
-                              </div>
-                            </DisclosurePanel>
-                          </>
-                        )}
-                      </Disclosure>
-                    ))}
-                </div>
-            </div>
-        </div>
+interface ModulesProps {
+  sections:
+    | {
+        id: number;
+        name: string;
+        units: {
+          id: number;
+          name: string;
+          description: string;
+          sectionId: number;
+          urls?: string;
+        }[];
+      }[]
+    | undefined;
+  setCurrentIndex: (sectionIndex: number, unitIndex: number) => void;
+  currentSection: number;
+  currentUnit: number;
+}
+
+export default function Modules({
+  sections,
+  setCurrentIndex,
+  currentSection,
+  currentUnit,
+}: ModulesProps) {
+  const [openSections, setOpenSections] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (currentSection !== -1 && !openSections.includes(currentSection)) {
+      setOpenSections([currentSection]);
+    }
+  }, [currentSection, openSections]);
+
+  const handleSectionClick = (sectionIndex: number) => {
+    setOpenSections((prev) =>
+      prev.includes(sectionIndex)
+        ? prev.filter((id) => id !== sectionIndex)
+        : [...prev, sectionIndex]
     );
+  };
+
+  return (
+    <div className="sticky top-[30px] h-[calc(100vh-30px)] bg-white shadow-lg mb-8 rounded-lg overflow-hidden">
+      <div className="p-4 max-h-full overflow-y-auto overflow-x-hidden">
+        <div className="w-[250px] space-y-3">
+          <div className="text-xl font-semibold mb-5 text-[#202020] capitalize border-b border-gray-100 pb-2">
+            Course Modules
+          </div>
+          {sections?.map((section, index) => (
+            <div key={index} className="mb-3">
+              <button
+                onClick={() => handleSectionClick(index)}
+                className={`flex w-full justify-between rounded-lg px-4 py-2.5 text-left text-sm font-medium focus:outline-none focus-visible:ring ${
+                  openSections.includes(index)
+                    ? "bg-[rgba(112,45,255,0.1)] text-[#702DFF]"
+                    : "bg-gray-50 text-[#202020] hover:bg-gray-100"
+                } ${
+                  currentSection === index ? "border-l-4 border-[#702DFF]" : ""
+                } transition-all duration-200`}
+              >
+                <span className="capitalize">{section.name}</span>
+                <ChevronUpIcon
+                  className={`${
+                    openSections.includes(index) ? "rotate-180 transform" : ""
+                  } h-5 w-5 transition-transform duration-300 ${
+                    openSections.includes(index)
+                      ? "text-[#702DFF]"
+                      : "text-gray-500"
+                  }`}
+                />
+              </button>
+              <div
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                  openSections.includes(index)
+                    ? "max-h-[500px] opacity-100"
+                    : "max-h-0 opacity-0"
+                }`}
+              >
+                <div className="px-2 pt-2 pb-2 text-sm">
+                  <div className="space-y-1">
+                    {section.units?.map((unit, unitIndex) => (
+                      <div
+                        key={unitIndex}
+                        className={`cursor-pointer p-2.5 rounded-lg flex items-center gap-3 transition-colors ${
+                          currentSection === index && currentUnit === unitIndex
+                            ? "bg-[rgba(112,45,255,0.1)] text-[#702DFF]"
+                            : "hover:bg-gray-50 text-[#7E7E7E]"
+                        }`}
+                        onClick={() => setCurrentIndex(index, unitIndex)}
+                      >
+                        <div
+                          className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                            currentSection === index &&
+                            currentUnit === unitIndex
+                              ? "bg-[#702DFF]"
+                              : "border border-gray-300"
+                          }`}
+                        ></div>
+                        <div
+                          className={`font-medium capitalize ${
+                            currentSection === index &&
+                            currentUnit === unitIndex
+                              ? "text-[#702DFF]"
+                              : "text-[#202020]"
+                          }`}
+                        >
+                          {unit.name}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
