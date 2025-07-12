@@ -1,9 +1,10 @@
-import prisma from "@/lib/prisma";
 import SessionWrapper from "../context/SessionWrapper";
 import { Session } from "next-auth";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
+import { sessionApiClient } from "@/lib/session-api-client";
+import { getErrorMessage } from "@/lib/api-utils";
 
 // Dynamically import the client wrapper with loading state
 const ClientWrapper = dynamic(() => import("./components/ClientWrapper"), {
@@ -50,17 +51,15 @@ type ExamData = {
   totalMarks: number;
 };
 
-async function getAttendedExams(
-  studentId: string,
-  token?: string
-): Promise<ExamData[]> {
+async function getAttendedExams(studentId: string): Promise<ExamData[]> {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_REST_URL}/auth/students/${studentId}/exams`,
-      { headers: { token: token as string } }
-    );
-    const { data } = await res.json();
-    return data;
+    const response = await sessionApiClient.getUserExams(studentId);
+    if (response.success) {
+      return Array.isArray(response.data) ? response.data : [];
+    } else {
+      console.error('Failed to fetch user exams:', getErrorMessage(response));
+      return [];
+    }
   } catch (error) {
     console.error("Error fetching user exams:", error);
     return [];
@@ -76,10 +75,7 @@ export default function MyExamsPage() {
 }
 
 async function MyExamsContent({ session }: { session: Session }) {
-  const attendedExams = await getAttendedExams(
-    session?.user?.id as string,
-    session?.accessToken
-  );
+  const attendedExams = await getAttendedExams(session?.user?.id as string);
   if (attendedExams.length === 0) {
     return (
       <div className="flex-1 relative bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-[calc(100vh-6rem)]">

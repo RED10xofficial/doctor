@@ -1,24 +1,21 @@
 import React from "react";
 import { auth } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { Exam, Question } from "@prisma/client";
+import { sessionApiClient } from "@/lib/session-api-client";
+import { getErrorMessage } from "@/lib/api-utils";
 import ProfileToggle from "./ProfileToggle";
 
-// Define types for exam with questions
-type ExamWithQuestions = Exam & {
-  questions: {
-    question: Question;
-  }[];
-};
-
-// Function to get user's attended exams
-async function getUserExams(userId: string, token?: string) {
+// Function to get user's attended exams using the session-aware API client
+async function getUserExams(userId: string) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_REST_URL}/auth/students/${userId}/exams?limit=3`, { headers: { token: token as string }})
-    const {data} = await res.json();
-    return data;
+    const response = await sessionApiClient.getUserExams(userId, 3);
+    if (response.success) {
+      return Array.isArray(response.data) ? response.data : [];
+    } else {
+      console.error('Failed to fetch user exams:', getErrorMessage(response));
+      return [];
+    }
   } catch (error) {
-    console.error("Error fetching user exams:", error);
+    console.error('Network error fetching user exams:', error);
     return [];
   }
 }
@@ -27,7 +24,7 @@ const ProfileSidebar = async () => {
   const session = await auth();
   const userId = session?.user?.id;
   // Get user's exams if logged in
-  const userExams = userId ? await getUserExams(userId, session?.accessToken) : [];
+  const userExams = userId ? await getUserExams(userId) : [];
 
   // Return the profile toggle component with profile content
   return <ProfileToggle session={session} userExams={userExams} />;

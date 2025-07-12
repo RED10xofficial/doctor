@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { sessionApiClient } from "@/lib/session-api-client";
 import { Difficulty } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
@@ -10,55 +11,16 @@ export async function createCustomExam(
   questionCount: number
 ) {
   try {
-    // Convert difficulty string to enum
-    const difficultyEnum = difficulty.toUpperCase() as Difficulty;
-
-    // Get random questions of specified difficulty
-    const questions = await prisma.question.findMany({
-      where: {
-        difficulty: difficultyEnum,
-      },
-      include: {
-        options: true,
-      },
-      take: questionCount,
-    });
-
-    if (questions.length < questionCount) {
-      throw new Error(
-        `Not enough ${difficulty} questions available. Only ${questions.length} found.`
-      );
+  
+    const response = await sessionApiClient.buildExam({difficulty, questionCount, examName});
+    
+    if (response.success) {
+      revalidatePath("/build-exam");
+    } else {
+      throw new Error('Failed to build exam');
     }
-
-    // Create a new exam
-    const exam = await prisma.exam.create({
-      data: {
-        name: examName,
-        unitId: 1, // You might want to make this dynamic based on your needs
-        duration: 60, // Default duration in minutes
-        questions: {
-          create: questions.map((question) => ({
-            questionId: question.id,
-          })),
-        },
-        instruction:
-          "This is an exam build based on the difficulty of your choice. Please answer all questions to the best of your ability.",
-      },
-      include: {
-        questions: {
-          include: {
-            question: {
-              include: {
-                options: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    revalidatePath("/build-exam");
-    return exam;
+    
+    return response.data;
   } catch (error) {
     console.error("Error creating custom exam:", error);
     throw error;

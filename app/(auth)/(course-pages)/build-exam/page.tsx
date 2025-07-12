@@ -10,7 +10,7 @@ import * as z from "zod";
 
 const examSchema = z.object({
   examName: z.string().min(1, "Exam name is required"),
-  difficulty: z.enum(["easy", "medium", "hard"]),
+  difficulty: z.enum(["EASY", "MEDIUM", "HARD"]),
   questionCount: z.number().min(1).max(50),
 });
 
@@ -29,7 +29,7 @@ export default function ExamConfig() {
     resolver: zodResolver(examSchema),
     defaultValues: {
       examName: "",
-      difficulty: "medium",
+      difficulty: "MEDIUM",
       questionCount: 10,
     },
   });
@@ -96,9 +96,9 @@ export default function ExamConfig() {
               {...register("difficulty")}
               className="mt-1 p-3 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             >
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
+              <option value="EAST">Easy</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HARD">Hard</option>
             </select>
             {errors.difficulty && (
               <p className="mt-1 text-sm text-red-600">

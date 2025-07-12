@@ -8,6 +8,8 @@ import { userSchema } from "@/lib/schema/user.schema";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "@/app/components/Snackbar";
+import { userApi } from "@/lib/api-client";
+import { getErrorMessage } from "@/lib/api-utils";
 
 type FormData = z.infer<typeof userSchema>;
 
@@ -46,20 +48,18 @@ export default function SignupForm({ examTypes }: SignupFormProps) {
       if (formData.confirmPassword) {
         delete formData.confirmPassword;
       }
-      const response = await fetch(`${process.env.NEXT_PUBLIC_REST_URL}/students`, {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      if (data.success) {
+      
+      // Use the robust API client for user registration
+      const response = await userApi.createUser(formData);
+      
+      if (response.success) {
         showSnackbar("Account created successfully! Please login.", "success");
         router.push("/login");
       } else {
-        showSnackbar(data.message, "error");
+        showSnackbar(getErrorMessage(response), "error");
       }
     } catch (error) {
-      const authError = error as AuthError;
-      showSnackbar(authError.message || "Something went wrong", "error");
+      showSnackbar("Network error occurred. Please try again.", "error");
     } finally {
       setIsLoading(false);
     }

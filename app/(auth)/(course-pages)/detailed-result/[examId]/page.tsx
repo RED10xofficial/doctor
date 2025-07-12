@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import prisma from "@/lib/prisma";
 import { Suspense } from "react";
 import LoadingState from "./loading";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
@@ -8,6 +7,8 @@ import ClientWrapper from "./components/ClientWrapper";
 import { Option, Exam, Question, ExamScore } from "@prisma/client";
 import SessionWrapper from "../../context/SessionWrapper";
 import { Session } from "next-auth";
+import { sessionApiClient } from "@/lib/session-api-client";
+import { getErrorMessage } from "@/lib/api-utils";
 
 export const metadata: Metadata = {
   title: "Detailed Result - Medical Education Platform",
@@ -77,14 +78,17 @@ async function DetailedResultContent({
   const examId = resolvedParams.examId;
   const studentId = session.user.id;
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_REST_URL}/auth/students/${studentId}/exams/${examId}`,
-    { headers: { token: session.accessToken as string } }
-  );
-
-  const {data} = await res.json()
-
-  if (!data) {
+  // Fetch detailed exam data using the session-aware API client
+  let data;
+  try {
+    const response = await sessionApiClient.getDetailedExamData(studentId, examId);
+    data = response.success ? response.data : null;
+    
+    if (!data) {
+      redirect("/details");
+    }
+  } catch (error) {
+    console.error('Error fetching detailed exam data:', error);
     redirect("/details");
   }
 

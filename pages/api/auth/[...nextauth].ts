@@ -2,6 +2,8 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import NextAuth, { Session, SessionStrategy, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import { userApi, LoginResponse } from "@/lib/api-client";
+import { handleApiError } from "@/lib/api-utils";
 
 interface CustomSessionUser {
     id: string;
@@ -28,25 +30,30 @@ export const authOptions = {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-        // Call your REST API to verify credentials
-        const res = await fetch(`${process.env.NEXT_PUBLIC_REST_URL}/students/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        
+        try {
+          // Use the robust API client for authentication
+          const response = await userApi.loginUser({
             email: credentials.email,
             password: credentials.password,
-          }),
-        });
-        const { data } = await res.json();
-        if (res.ok && data) {
-          // Attach the token to the user object
-          return {
-            ...data.student,
-            token: data.token, // if your API returns a JWT or similar
-          };
+          });
+          
+          if (response.success && response.data) {
+            // Attach the token to the user object
+            const data = response.data as LoginResponse;
+            return {
+              ...data.student,
+              token: data.token, // if your API returns a JWT or similar
+            };
+          } else {
+            // Log the specific error message from the API
+            console.error('Authentication failed:', response.message);
+            // Return null to indicate failed authentication
+            return null;
+          }
+        } catch (error) {
+          return null;
         }
-        // Return null if authentication fails
-        return null;
       },
     })
   ],
@@ -81,6 +88,11 @@ export const authOptions = {
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: '/login',
+    error: '/login', // Redirect to login page on error
+  },
+  debug: process.env.NODE_ENV === 'development',
 };
 
 export default NextAuth(authOptions);

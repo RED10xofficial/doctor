@@ -1,16 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Timer } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Popup from "@/app/components/popup";
 import ExamInstructions from "../../components/examInstructions";
 import { useSnackbar } from "@/app/components/Snackbar";
-import { Option } from "@prisma/client";
-import { submitAnswer, submitExam } from "../actions";
+import { submitExam } from "../actions";
+
+interface Option {
+  id: string;
+  optionKey: string;
+  text: string;
+}
 
 interface Question {
-  id: number;
+  id: string;
   question: string;
   questionSlug: string;
   difficulty: string | null;
@@ -18,13 +23,11 @@ interface Question {
 }
 
 interface Exam {
-  id: number;
+  id: string;
   name: string;
   instruction: string | null;
   duration: number;
-  questions: {
-    question: Question;
-  }[];
+  questions: Question[];
 }
 
 interface ExamClientProps {
@@ -38,6 +41,19 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
   const [time, setTime] = useState(0);
   const [isOpen, setIsOpen] = useState(true);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+
+  const answers = useRef(
+    exam.questions.reduce(
+      (
+        acc: Record<string, { option: string; optionId: string }>,
+        item: Question
+      ) => {
+        acc[item.id] = { option: "", optionId: "" };
+        return acc;
+      },
+      {}
+    )
+  );
 
   const startTimer = () => {
     setIsOpen(false);
@@ -68,33 +84,24 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
   };
 
   const handleAnswerQuestion = async (
-    questionId: number,
+    questionId: string,
     answer: string,
-    optionId: number
+    optionId: string
   ) => {
-    try {
-      await submitAnswer({
-        questionId,
-        examId: exam.id,
-        studentId: userId,
-        answerText: answer,
-        studentAnswer: optionId,
-        score: 1,
-      });
-    } catch (error) {
-      console.error("Error submitting answer:", error);
-      showSnackbar("Failed to submit answer", "error");
-    }
+    answers.current[questionId] = { option: answer, optionId };
   };
 
   const handleSubmitExam = async () => {
     try {
-      await submitExam({
-        studentId: userId,
-        examId: exam.id,
-      });
+      await submitExam(
+        {
+          studentId: userId,
+          examId: exam.id,
+          answers: answers.current,
+        }
+      );
       showSnackbar("Your answers have been submitted", "success");
-      router.push(`/exam-result/${exam.id}`);
+      // router.push(`/exam-result/${exam.id}`);
     } catch {
       showSnackbar("Failed to submit exam", "error");
     }
@@ -117,7 +124,7 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
 
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             {exam.questions.map((questionExam, index: number) => {
-              const question = questionExam.question;
+              const question = questionExam;
               return (
                 <div key={question.id} className="bg-white rounded-lg p-4">
                   <h2 className="text-lg font-semibold">

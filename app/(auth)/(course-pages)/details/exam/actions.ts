@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Difficulty } from "@prisma/client";
+import { sessionApiClient } from "@/lib/session-api-client";
 
 interface SubmitAnswerParams {
   questionId: number;
@@ -15,7 +16,8 @@ interface SubmitAnswerParams {
 
 interface SubmitExamParams {
   studentId: string;
-  examId: number;
+  examId: string;
+  answers: Record<string, {option: string, optionId: string}>
 }
 
 export async function submitAnswer(params: SubmitAnswerParams) {
@@ -93,17 +95,15 @@ export async function submitAnswer(params: SubmitAnswerParams) {
 
 export async function submitExam(params: SubmitExamParams) {
   try {
-    await prisma.examScore.updateMany({
-      where: {
-        studentId: parseInt(params.studentId),
-        examId: params.examId,
-      },
-      data: {
-        submitted: true
-      }
-    });
-    revalidatePath(`/details/exam/${params.examId}`);
+    const response = await sessionApiClient.submitExam(params);
+    
+    if (response.success) {
+      revalidatePath(`/details/exam/${params.examId}`);
+    } else {
+      throw new Error('Failed to submit exam');
+    }
   } catch (error) {
+    console.error('Error submitting exam:', error);
     throw error;
   }
 } 

@@ -84,8 +84,13 @@ export default function CourseContent({
           <div className="flex justify-end md:hidden gap-2 mb-2">
             <button
               type="button"
-              className="bg-[#702DFF] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#5924cc] transition-colors font-medium"
+              className={`bg-[#702DFF] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#5924cc] transition-colors font-medium ${
+                !currentUnit?.exams?.length
+                  ? "bg-gray-100 hover:bg-gray-200"
+                  : ""
+              }`}
               onClick={() => setIsExamPopupOpen(true)}
+              disabled={!currentUnit?.exams?.length}
             >
               Exams
             </button>
@@ -132,8 +137,13 @@ export default function CourseContent({
           <div className="hidden md:flex gap-2">
             <button
               type="button"
-              className="bg-[#702DFF] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#5924cc] transition-colors font-medium"
+              className={`bg-[#702DFF] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#5924cc] transition-colors font-medium ${
+                !currentUnit?.exams?.length
+                  ? "bg-gray-100 hover:bg-gray-200"
+                  : ""
+              }`}
               onClick={() => setIsExamPopupOpen(true)}
+              disabled={!currentUnit?.exams?.length}
             >
               Exams
             </button>

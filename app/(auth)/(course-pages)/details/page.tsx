@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import prisma from "@/lib/prisma";
 import { Section, Exam } from "@prisma/client";
 import { Suspense } from "react";
 import LoadingState from "@/app/components/LoadingState";
@@ -7,6 +6,8 @@ import ErrorBoundary from "@/app/components/ErrorBoundary";
 import ClientWrapper from "./components/ClientWrapper";
 import SessionWrapper from "../context/SessionWrapper";
 import { Session } from "next-auth";
+import { sessionApiClient } from "@/lib/session-api-client";
+import { getErrorMessage } from "@/lib/api-utils";
 
 export const metadata: Metadata = {
   title: "Course Details - Medical Education Platform",
@@ -47,23 +48,37 @@ async function DetailsContent({
   const params = await searchParams;
   const currentSectionIndex = parseInt((params.currentSection as string) || "0");
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_REST_URL}/sections?examType=${session.user.examType}`)
-  const {data} = await res.json();
-
-
-
-  return (
-    <div className="bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 w-full min-h-screen">
-      <div className="flex gap-4 p-4">
-        <ErrorBoundary>
-          <Suspense fallback={<LoadingState type="content" />}>
-            <ClientWrapper 
-              sections={data} 
-              initialSectionIndex={currentSectionIndex}
-            />
-          </Suspense>
-        </ErrorBoundary>
+  // Fetch sections using the session-aware API client
+  try {
+    const response = await sessionApiClient.getSections(session.user.examType);
+    const data = response.success ? response.data : [];
+    
+    return (
+      <div className="bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 w-full min-h-screen">
+        <div className="flex gap-4 p-4">
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingState type="content" />}>
+              <ClientWrapper 
+                sections={data} 
+                initialSectionIndex={currentSectionIndex}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        </div>
       </div>
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error('Error fetching sections:', error);
+    return (
+      <div className="bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 w-full min-h-screen">
+        <div className="flex gap-4 p-4">
+          <div className="w-full text-center py-8">
+            <div className="text-gray-500">
+              Unable to load course sections. Please try again later.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }

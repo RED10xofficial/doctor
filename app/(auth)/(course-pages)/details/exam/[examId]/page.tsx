@@ -1,47 +1,39 @@
 import { Suspense } from "react";
 import ExamClient from "./ExamClient";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
-import prisma from "@/lib/prisma";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import SessionWrapper from "../../../context/SessionWrapper";
 import ExamAttemptedMessage from "@/app/components/ExamAttemptedMessage";
 import { Session } from "next-auth";
+import { sessionApiClient } from "@/lib/session-api-client";
+import { getErrorMessage } from "@/lib/api-utils";
 
-async function checkExamAttempt(examId: string, userId: string) {
-  const existingAttempt = await prisma.examScore.findFirst({
-    where: {
-      examId: parseInt(examId),
-      studentId: parseInt(userId),
-      submitted: true
+async function checkExamAttempt(examId: string, studentId: string) {
+  try {
+    const response = await sessionApiClient.getExamResult(studentId, examId);
+    if (response.success && response.data) {
+      throw new Error('You have already attempted this exam.');
     }
-  });
-
-  if (existingAttempt) {
-    throw new Error('You have already attempted this exam.');
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('already attempted')) {
+      throw error;
+    }
+    // If it's not an "already attempted" error, we can proceed with the exam
   }
 }
 
 async function getExamData(examId: string) {
-  const exam = await prisma.exam.findUnique({
-    where: { id: parseInt(examId) },
-    include: {
-      questions: {
-        include: {
-          question: {
-            include: {
-              options: true
-            }
-          }
-        }
-      }
+  try {
+    const response = await sessionApiClient.getExam(examId);
+    if (response.success && response.data) {
+      return response.data;
+    } else {
+      throw new Error("Exam not found");
     }
-  });
-  
-  if (!exam) {
+  } catch (error) {
+    console.error('Error fetching exam data:', error);
     throw new Error("Exam not found");
   }
-  
-  return exam;
 }
 
 export default async function ExamPage({
@@ -56,7 +48,7 @@ export default async function ExamPage({
       {(session: Session) => (
         <ErrorBoundary>
           <Suspense fallback={<LoadingSpinner />}>
-            <ExamContent examId={examId} userId={session.user.id} />
+            <ExamContent examId={examId} userId={session.user.id} session={session} />
           </Suspense>
         </ErrorBoundary>
       )}
@@ -64,11 +56,11 @@ export default async function ExamPage({
   );
 }
 
-async function ExamContent({ examId, userId }: { examId: string; userId: string }) {
+async function ExamContent({ examId, userId, session }: { examId: string; userId: string, session: Session }) {
   try {
     await checkExamAttempt(examId, userId);
     const exam = await getExamData(examId);
-    return <ExamClient exam={exam} userId={userId} />;
+    return <ExamClient exam={exam} userId={userId}/>;
   } catch (error) {
     return (
       <ExamAttemptedMessage 
