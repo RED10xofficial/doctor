@@ -14,18 +14,18 @@ const Popup = dynamic(() => import("@/app/components/popup"), { ssr: false });
 
 type SectionWithUnits = Section & {
   units: {
-    id: number;
+    id: string;
     name: string;
     description: string;
     urls?: string;
-    sectionId: number;
+    sectionId: string;
     exams: Pick<Exam, "id" | "name" | "duration" | "unitId" | "instruction">[];
   }[];
 };
 
 interface CourseContentProps {
   sections: SectionWithUnits[];
-  initialSectionIndex: number;
+  initialSectionIndex: string;
 }
 
 export default function CourseContent({

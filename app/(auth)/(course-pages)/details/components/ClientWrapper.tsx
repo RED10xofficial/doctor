@@ -6,11 +6,11 @@ import { Section, Exam } from '@prisma/client';
 
 type SectionWithUnits = Section & {
   units: {
-    id: number;
+    id: string;
     name: string;
     description: string;
     urls?: string;
-    sectionId: number;
+    sectionId: string;
     exams: Pick<Exam, 'id' | 'name' | 'duration' | 'unitId' | 'instruction'>[];
   }[];
 };
@@ -22,7 +22,7 @@ const CourseContent = dynamic(() => import('./CourseContent'), {
 
 interface ClientWrapperProps {
   sections: SectionWithUnits[];
-  initialSectionIndex: number;
+  initialSectionIndex: string;
 }
 
 export default function ClientWrapper({ sections, initialSectionIndex }: ClientWrapperProps) {

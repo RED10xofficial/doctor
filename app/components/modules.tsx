@@ -5,14 +5,15 @@ import { useEffect, useState } from "react";
 interface ModulesProps {
   sections:
     | {
-        id: number;
+        id: string;
         name: string;
         units: {
-          id: number;
+          id: string;
           name: string;
           description: string;
-          sectionId: number;
+          sectionId: string;
           urls?: string;
+          exams?: any[];
         }[];
       }[]
     | undefined;

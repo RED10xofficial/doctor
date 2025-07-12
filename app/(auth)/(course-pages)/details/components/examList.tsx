@@ -1,7 +1,9 @@
 import { Exam } from "@prisma/client";
 import Link from "next/link";
 
-export default function ExamList({ exams }: { exams: Exam[] }) {
+type ExamListItem = Pick<Exam, "id" | "name" | "duration" | "unitId" | "instruction">;
+
+export default function ExamList({ exams }: { exams: ExamListItem[] }) {
   return (
     <div className="mt-2">
       {exams.map((exam) => (
