@@ -35,7 +35,7 @@ async function ExamResultContent({
   }
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_REST_URL}/auth/students/${studentId}/exams/${examId}`,
+    `${process.env.NEXT_PUBLIC_REST_URL}/auth/students/${studentId}/result/${examId}`,
     { headers: { token: session.accessToken as string } }
   );
 
@@ -52,7 +52,7 @@ async function ExamResultContent({
   }
 
   // Calculate exam statistics
-  const totalQuestions = data.questionCount;
+  const totalQuestions = data.totalMarks;
   const correctAnswers = data.marksScored;
   const percentage = Math.round((correctAnswers / totalQuestions) * 100);
   const isPassed = percentage >= 40; // Assuming 40% is passing score

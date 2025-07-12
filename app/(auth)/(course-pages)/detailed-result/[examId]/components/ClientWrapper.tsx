@@ -5,6 +5,14 @@ import { ReceiptText } from "lucide-react";
 
 type OptionType = Option & { correctAnswer: boolean };
 
+
+type QuestionStat = {
+      totalCorrect: number;
+      totalInCorrect: number;
+      isCorrect: boolean;
+    };
+  
+
 // Define the type for the exam statistics
 interface ExamStatistics {
   id: number;
@@ -22,25 +30,20 @@ interface ExamStatistics {
     };
   };
   data: {
-    [questionId: number]: {
-      totalCorrect: number;
-      totalInCorrect: number;
-      isCorrect: boolean;
-    };
-  };
+    [questionId: number]: QuestionStat;}
 }
 
 // Define the props for the QuestionResult component
 interface QuestionResultProps {
   question: ExamStatistics["questions"][number];
   index: number;
-  examData: ExamStatistics["data"];
+  questionStat: QuestionStat;
 }
 
 // Create a QuestionResult component to render each question
-function QuestionResult({ question, index, examData }: QuestionResultProps) {
-  const totalCorrect = examData[question.id]?.totalCorrect ?? 0;
-  const totalInCorrect = examData[question.id]?.totalInCorrect ?? 0;
+function QuestionResult({ question, index, questionStat }: QuestionResultProps) {
+  const totalCorrect = questionStat.totalCorrect ?? 0;
+  const totalInCorrect = questionStat.totalInCorrect ?? 0;
 
   const totalAttempts = totalCorrect + totalInCorrect;
 
@@ -52,7 +55,7 @@ function QuestionResult({ question, index, examData }: QuestionResultProps) {
     <div
       key={question.id}
       className={`bg-gray-100 rounded-lg p-6 space-y-4  ${
-        examData[question.id]?.isCorrect ? "" : "bg-red-50"
+        questionStat.isCorrect ? "" : "bg-red-50"
       }`}
     >
       <h3 className="font-medium">{`${index + 1}. ${question.question}`}</h3>
@@ -146,7 +149,7 @@ export default function ClientWrapper({ examData }: ClientWrapperProps) {
               key={question.id}
               question={question}
               index={index}
-              examData={examData.data}
+              questionStat={examData.data[question.id] || {}}
             />
           ))}
       </div>

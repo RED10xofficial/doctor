@@ -47,31 +47,6 @@ async function DetailsContent({
   const params = await searchParams;
   const currentSectionIndex = parseInt((params.currentSection as string) || "0");
 
-  // Fetch sections with units and exams in a single query
-  const sections = await prisma.section.findMany({
-    where: {
-      examType: session.user.examType
-    },
-    include: {
-      units: {
-        include: {
-          exams: {
-            select: {
-              id: true,
-              name: true,
-              duration: true,
-              unitId: true,
-              instruction: true,
-            },
-          },
-        },
-      },
-    },
-    orderBy: {
-      name: 'asc'
-    }
-  }) as SectionWithUnits[];
-
   const res = await fetch(`${process.env.NEXT_PUBLIC_REST_URL}/sections?examType=${session.user.examType}`)
   const {data} = await res.json();
 
