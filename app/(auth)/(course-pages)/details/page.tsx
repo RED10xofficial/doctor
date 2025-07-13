@@ -16,11 +16,11 @@ export const metadata: Metadata = {
 
 type SectionWithUnits = Section & {
   units: {
-    id: number;
+    id: string;
     name: string;
     description: string;
     urls?: string;
-    sectionId: number;
+    sectionId: string;
     exams: Pick<Exam, 'id' | 'name' | 'duration' | 'unitId' | 'instruction'>[];
   }[];
 };
@@ -46,7 +46,8 @@ async function DetailsContent({
 }) {
   // Await searchParams before accessing its properties
   const params = await searchParams;
-  const currentSectionIndex = parseInt((params.currentSection as string) || "0");
+  const currentSectionId = params.sectionId as string;
+  const currentUnitId = params.unitId as string;
 
   // Fetch sections using the session-aware API client
   try {
@@ -60,7 +61,8 @@ async function DetailsContent({
             <Suspense fallback={<LoadingState type="content" />}>
               <ClientWrapper 
                 sections={data} 
-                initialSectionIndex={currentSectionIndex}
+                initialSectionId={currentSectionId}
+                initialUnitId={currentUnitId}
               />
             </Suspense>
           </ErrorBoundary>

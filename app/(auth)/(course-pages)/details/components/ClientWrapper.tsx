@@ -22,14 +22,16 @@ const CourseContent = dynamic(() => import('./CourseContent'), {
 
 interface ClientWrapperProps {
   sections: SectionWithUnits[];
-  initialSectionIndex: string;
+  initialSectionId?: string;
+  initialUnitId?: string;
 }
 
-export default function ClientWrapper({ sections, initialSectionIndex }: ClientWrapperProps) {
+export default function ClientWrapper({ sections, initialSectionId, initialUnitId }: ClientWrapperProps) {
   return (
     <CourseContent 
       sections={sections} 
-      initialSectionIndex={initialSectionIndex}
+      initialSectionId={initialSectionId}
+      initialUnitId={initialUnitId}
     />
   );
 } 

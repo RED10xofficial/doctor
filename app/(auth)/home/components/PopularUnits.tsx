@@ -64,7 +64,7 @@ export default async function PopularUnits({ examType }: PopularUnitsProps) {
                 </div>
                 <div className="text-center md:text-right">
                   <Link
-                    href={`/details?currentSection=${unit.sectionId}`}
+                    href={`/details?sectionId=${unit.sectionId}&unitId=${unit.id}`}
                     className="px-3 py-1 bg-blue-100 text-blue-600 rounded-lg text-xs block md:inline-block"
                   >
                     SHOW SECTION

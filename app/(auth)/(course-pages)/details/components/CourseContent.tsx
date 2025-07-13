@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Section, Exam } from "@prisma/client";
 import Modules from "@/app/components/modules";
 import { AlignRightIcon, BookOpenIcon } from "lucide-react";
@@ -25,25 +25,33 @@ type SectionWithUnits = Section & {
 
 interface CourseContentProps {
   sections: SectionWithUnits[];
-  initialSectionIndex: string;
+  initialSectionId?: string;
+  initialUnitId?: string;
 }
 
 export default function CourseContent({
   sections,
-  initialSectionIndex,
+  initialSectionId,
+  initialUnitId,
 }: CourseContentProps) {
-  let incommingSectionIndex = 0;
-  incommingSectionIndex = sections.findIndex(
-    (section) => section.id === initialSectionIndex
-  );
-  if (incommingSectionIndex === -1) {
-    incommingSectionIndex = 0;
-  }
+  // Find initial section and unit by ID
+  const initialSectionIndex = useMemo(() => {
+    if (!initialSectionId) return 0;
+    const index = sections.findIndex(section => section.id === initialSectionId);
+    return index !== -1 ? index : 0;
+  }, [sections, initialSectionId]);
+
+  const initialUnitIndex = useMemo(() => {
+    if (!initialUnitId || initialSectionIndex === -1) return 0;
+    const section = sections[initialSectionIndex];
+    if (!section) return 0;
+    const index = section.units.findIndex(unit => unit.id === initialUnitId);
+    return index !== -1 ? index : 0;
+  }, [sections, initialSectionIndex, initialUnitId]);
+
   const [openModules, setOpenModules] = useState(false);
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(
-    incommingSectionIndex
-  );
-  const [currentUnitIndex, setCurrentUnitIndex] = useState(0);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(initialSectionIndex);
+  const [currentUnitIndex, setCurrentUnitIndex] = useState(initialUnitIndex);
   const [isExamPopupOpen, setIsExamPopupOpen] = useState(false);
   const [isVideoPopupOpen, setIsVideoPopupOpen] = useState(false);
 
@@ -56,14 +64,23 @@ export default function CourseContent({
       setCurrentUnitIndex(unitIndex);
       setOpenModules(false);
 
-      // Update URL without full page reload
+      // Update URL with section and unit IDs
       if (searchParams) {
         const newParams = new URLSearchParams(searchParams.toString());
-        newParams.set("currentSection", sectionIndex.toString());
+        const section = sections[sectionIndex];
+        const unit = section?.units[unitIndex];
+        
+        if (section) {
+          newParams.set("sectionId", section.id);
+        }
+        if (unit) {
+          newParams.set("unitId", unit.id);
+        }
+        
         router.push(`?${newParams.toString()}`, { scroll: false });
       }
     },
-    [router, searchParams]
+    [router, searchParams, sections]
   );
 
   const currentSection = sections[currentSectionIndex];
