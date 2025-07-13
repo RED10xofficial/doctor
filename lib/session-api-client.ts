@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { auth } from "@/lib/auth";
 import { apiClient } from "./api-client";
+import { sessionHandler } from "./session-handler";
 
 // Session-aware API client that automatically gets token from session
 export class SessionApiClient {
@@ -27,12 +28,28 @@ export class SessionApiClient {
     return this.client;
   }
 
+  // Handle 401 errors by clearing session and redirecting
+  private async handleUnauthorized() {
+    await sessionHandler.handleUnauthorized();
+  }
+
   // Generic method to make authenticated API calls
   private async makeAuthenticatedCall<T>(
     apiCall: (client: any) => Promise<T>
   ): Promise<T> {
-    const authenticatedClient = await this.getAuthenticatedClient();
-    return apiCall(authenticatedClient);
+    try {
+      const authenticatedClient = await this.getAuthenticatedClient();
+      const response = await apiCall(authenticatedClient);
+      return response;
+    } catch (error: any) {
+      // Check if it's a 401 error
+      if (sessionHandler.isUnauthorizedError(error)) {
+        // Clear session and redirect to login
+        await this.handleUnauthorized();
+        throw new Error('Session expired. Please login again.');
+      }
+      throw error;
+    }
   }
 
   // Exam API methods

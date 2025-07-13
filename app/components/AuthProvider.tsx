@@ -2,6 +2,7 @@
 
 import { SessionProvider } from "next-auth/react";
 import { SnackbarProvider } from "./Snackbar";
+import { SessionHandlerSetup } from "./SessionHandlerSetup";
 
 export default function AuthProvider({
   children,
@@ -10,7 +11,10 @@ export default function AuthProvider({
 }) {
   return (
     <SessionProvider>
-      <SnackbarProvider>{children}</SnackbarProvider>
+      <SnackbarProvider>
+        <SessionHandlerSetup />
+        {children}
+      </SnackbarProvider>
     </SessionProvider>
   );
 }
