@@ -7,7 +7,6 @@ import ClientWrapper from "./components/ClientWrapper";
 import SessionWrapper from "../context/SessionWrapper";
 import { Session } from "next-auth";
 import { sessionApiClient } from "@/lib/session-api-client";
-import { getErrorMessage } from "@/lib/api-utils";
 
 export const metadata: Metadata = {
   title: "Course Details - Medical Education Platform",
