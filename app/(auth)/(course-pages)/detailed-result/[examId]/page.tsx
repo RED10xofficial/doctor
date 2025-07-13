@@ -4,11 +4,9 @@ import { Suspense } from "react";
 import LoadingState from "./loading";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import ClientWrapper from "./components/ClientWrapper";
-import { Option, Exam, Question, ExamScore } from "@prisma/client";
 import SessionWrapper from "../../context/SessionWrapper";
 import { Session } from "next-auth";
 import { sessionApiClient } from "@/lib/session-api-client";
-import { getErrorMessage } from "@/lib/api-utils";
 
 export const metadata: Metadata = {
   title: "Detailed Result - Medical Education Platform",
@@ -18,46 +16,6 @@ export const metadata: Metadata = {
 interface PageProps {
   params: Promise<{ examId: string }>;
 }
-
-interface ExamStatistics {
-  id: number;
-  name: string;
-  unitId: number;
-  instruction?: string;
-  duration: number;
-  totalPoints: number;
-  maxPoints: number;
-  questions: {
-    [questionId: number]: {
-      id: number;
-      question: string;
-      options: OptionType[];
-    };
-  };
-  data: {
-    [questionId: number]: {
-      totalCorrect: number;
-      totalInCorrect: number;
-      isCorrect: boolean;
-    };
-  };
-}
-
-type OptionType = Option & {
-  correctAnswer: boolean;
-};
-
-type QuestionWithRelations = Question & {
-  options: Option[];
-  examScores: ExamScore[];
-};
-
-type ExamWithRelations = Exam & {
-  questions: {
-    question: QuestionWithRelations;
-  }[];
-  examScores: ExamScore[];
-};
 
 export default function DetailedResultPage({ params }: PageProps) {
   return (

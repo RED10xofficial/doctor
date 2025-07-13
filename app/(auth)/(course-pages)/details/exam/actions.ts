@@ -3,15 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { sessionApiClient } from "@/lib/session-api-client";
 
-interface SubmitAnswerParams {
-  questionId: number;
-  examId: number;
-  studentId: string;
-  answerText: string;
-  studentAnswer: number;
-  score: number;
-}
-
 interface SubmitExamParams {
   studentId: string;
   examId: string;

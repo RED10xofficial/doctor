@@ -1,5 +1,4 @@
 import { sessionApiClient } from "@/lib/session-api-client";
-import { getErrorMessage } from "@/lib/api-utils";
 
 interface StatsProps {
   examType: string;
@@ -85,7 +84,7 @@ export default async function Stats({ examType }: StatsProps) {
         </div>
       </div>
     );
-  } catch (error) {
+  } catch {
     return (
       <div className="w-full grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between relative">

@@ -6,7 +6,6 @@ import SessionWrapper from "../../../context/SessionWrapper";
 import ExamAttemptedMessage from "@/app/components/ExamAttemptedMessage";
 import { Session } from "next-auth";
 import { sessionApiClient } from "@/lib/session-api-client";
-import { getErrorMessage } from "@/lib/api-utils";
 
 async function checkExamAttempt(examId: string, studentId: string) {
   try {
@@ -48,7 +47,7 @@ export default async function ExamPage({
       {(session: Session) => (
         <ErrorBoundary>
           <Suspense fallback={<LoadingSpinner />}>
-            <ExamContent examId={examId} userId={session.user.id} session={session} />
+            <ExamContent examId={examId} userId={session.user.id} />
           </Suspense>
         </ErrorBoundary>
       )}
@@ -56,7 +55,7 @@ export default async function ExamPage({
   );
 }
 
-async function ExamContent({ examId, userId, session }: { examId: string; userId: string, session: Session }) {
+async function ExamContent({ examId, userId }: { examId: string; userId: string }) {
   try {
     await checkExamAttempt(examId, userId);
     const exam = await getExamData(examId);

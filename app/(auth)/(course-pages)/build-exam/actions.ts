@@ -1,8 +1,6 @@
 "use server";
 
-import prisma from "@/lib/prisma";
 import { sessionApiClient } from "@/lib/session-api-client";
-import { Difficulty } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function createCustomExam(

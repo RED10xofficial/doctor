@@ -1,4 +1,5 @@
 "use client";
+import { Exam } from "@prisma/client";
 import { ChevronUpIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -13,7 +14,7 @@ interface ModulesProps {
           description: string;
           sectionId: string;
           urls?: string;
-          exams?: any[];
+          exams?: Exam[];
         }[];
       }[]
     | undefined;

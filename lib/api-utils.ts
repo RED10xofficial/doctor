@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ApiResponse, ApiError } from './api-client';
 
 // Utility function to safely extract data from API response

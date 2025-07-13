@@ -1,9 +1,8 @@
 // pages/api/auth/[...nextauth].ts
 import CredentialsProvider from "next-auth/providers/credentials";
-import NextAuth, { Session, SessionStrategy, User } from "next-auth";
+import NextAuth, { Session, SessionStrategy } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import { userApi, LoginResponse } from "@/lib/api-client";
-import { handleApiError } from "@/lib/api-utils";
 
 interface CustomSessionUser {
     id: string;
@@ -11,12 +10,15 @@ interface CustomSessionUser {
     email: string;
     image?: string | null;
     examType: string;
+    token?:string
 }
 
 interface CustomSession extends Session {
   user: CustomSessionUser;
   accessToken?: string;
 }
+
+
 
 export const authOptions = {
   providers: [
@@ -51,7 +53,7 @@ export const authOptions = {
             // Return null to indicate failed authentication
             return null;
           }
-        } catch (error) {
+        } catch {
           return null;
         }
       },
@@ -61,6 +63,7 @@ export const authOptions = {
     strategy: "jwt" as SessionStrategy, // Store session as JWT
   },
   callbacks: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async jwt({ token, user }: { token: JWT; user: any }) {
       // Persist the token from your API to the JWT
       if (user) {

@@ -53,7 +53,7 @@ export default function LoginForm() {
         // Show the specific error message from the API
         showSnackbar(getErrorMessage(apiResponse), "error");
       }
-    } catch (error) {
+    } catch {
       showSnackbar("Network error occurred. Please try again.", "error");
     } finally {
       setIsLoading(false);

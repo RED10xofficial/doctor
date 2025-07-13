@@ -13,10 +13,6 @@ import { getErrorMessage } from "@/lib/api-utils";
 
 type FormData = z.infer<typeof userSchema>;
 
-interface AuthError extends Error {
-  message: string;
-}
-
 type ExamType = { id: number; name: string, slug: string };
 
 interface SignupFormProps {
@@ -58,7 +54,7 @@ export default function SignupForm({ examTypes }: SignupFormProps) {
       } else {
         showSnackbar(getErrorMessage(response), "error");
       }
-    } catch (error) {
+    } catch {
       showSnackbar("Network error occurred. Please try again.", "error");
     } finally {
       setIsLoading(false);

@@ -7,7 +7,6 @@ import ErrorBoundary from "@/app/components/ErrorBoundary";
 import SessionWrapper from "../../context/SessionWrapper";
 import { Session } from "next-auth";
 import { sessionApiClient } from "@/lib/session-api-client";
-import { getErrorMessage } from "@/lib/api-utils";
 
 export default function ExamResultPage({
   params,

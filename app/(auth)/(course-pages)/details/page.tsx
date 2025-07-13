@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { Section, Exam } from "@prisma/client";
 import { Suspense } from "react";
 import LoadingState from "@/app/components/LoadingState";
 import ErrorBoundary from "@/app/components/ErrorBoundary";

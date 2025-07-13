@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Unit, Exam, Section } from "@prisma/client";
 import { sessionApiClient } from "@/lib/session-api-client";
-import { getErrorMessage } from "@/lib/api-utils";
 
 type UnitWithExams = Unit & {
   examCount: number;
