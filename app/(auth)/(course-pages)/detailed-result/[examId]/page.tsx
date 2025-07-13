@@ -6,7 +6,8 @@ import ErrorBoundary from "@/app/components/ErrorBoundary";
 import ClientWrapper from "./components/ClientWrapper";
 import SessionWrapper from "../../context/SessionWrapper";
 import { Session } from "next-auth";
-import { sessionApiClient } from "@/lib/session-api-client";
+import apiClient, { ErrorResponse } from "@/lib/api";
+import { ErrorInjector } from "@/app/components/ErrorInjector";
 
 export const metadata: Metadata = {
   title: "Detailed Result - Medical Education Platform",
@@ -39,16 +40,25 @@ async function DetailedResultContent({
   // Fetch detailed exam data using the session-aware API client
   let data;
   try {
-    const response = await sessionApiClient.getDetailedExamData(studentId, examId);
+    const { data: response } = await apiClient.get(
+      `/auth/students/${studentId}/exams/${examId}`,
+      {
+        headers: {
+          token: session.accessToken,
+        },
+      }
+    );
     data = response.success ? response.data : null;
-    
+
     if (!data) {
       redirect("/details");
     }
-  } catch (error) {
-    console.error('Error fetching detailed exam data:', error);
-    redirect("/details");
+  } catch (err) {
+    const e = err as ErrorResponse;
+    data = e;
   }
+
+  const { error, status } = data;
 
   return (
     <div className="flex-1 bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-screen">
@@ -57,6 +67,7 @@ async function DetailedResultContent({
           <Suspense fallback={<LoadingState />}>
             <ClientWrapper examData={data} />
           </Suspense>
+          <ErrorInjector error={error} status={status} />
         </ErrorBoundary>
       </div>
     </div>

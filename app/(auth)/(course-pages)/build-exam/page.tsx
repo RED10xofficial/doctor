@@ -7,6 +7,7 @@ import { useSnackbar } from "@/app/components/Snackbar";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { ErrorResponse } from "@/lib/api";
 
 const examSchema = z.object({
   examName: z.string().min(1, "Exam name is required"),
@@ -43,7 +44,10 @@ export default function ExamConfig() {
         data.difficulty,
         data.questionCount
       );
-      router.push(`/details/exam/${exam.id}`);
+      if (exam.success) {
+        router.push(`/details/exam/${exam.id}`);
+      }
+      showSnackbar(exam.message, "error");
     } catch (error) {
       if (error instanceof Error) {
         showSnackbar(error.message, "error");

@@ -1,15 +1,12 @@
-import { sessionApiClient } from "@/lib/session-api-client";
-
 interface StatsProps {
-  examType: string;
+  units: number;
+  sections: number;
+  exams: number;
 }
 
-export default async function Stats({ examType }: StatsProps) {
+export default async function Stats(data: StatsProps) {
   // Fetch stats using the session-aware API client
   try {
-    const response = await sessionApiClient.getStats(examType);
-    const data = response.success ? response.data : { sections: 0, units: 0, exams: 0 };
-    
     return (
       <div className="w-full grid grid-cols-3 gap-3">
         <div className="bg-white rounded-xl p-4 shadow-md flex flex-row items-center justify-between relative">

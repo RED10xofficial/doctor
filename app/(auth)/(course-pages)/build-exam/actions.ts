@@ -1,6 +1,6 @@
 "use server";
-
-import { sessionApiClient } from "@/lib/session-api-client";
+import apiClient from "@/lib/api";
+import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 export async function createCustomExam(
@@ -9,18 +9,20 @@ export async function createCustomExam(
   questionCount: number
 ) {
   try {
-  
-    const response = await sessionApiClient.buildExam({difficulty, questionCount, examName});
-    
+    const session = await auth();
+
+    const { data: response } = await apiClient.post(
+      `/auth/exams/build`,
+      { difficulty, noOfQuestions: questionCount, examName },
+      { headers: { token: session?.accessToken } }
+    );
+
     if (response.success) {
       revalidatePath("/build-exam");
-    } else {
-      throw new Error('Failed to build exam');
+      return response.data;
     }
-    
-    return response.data;
+    return response;
   } catch (error) {
-    console.error("Error creating custom exam:", error);
-    throw error;
+    return error;
   }
 }

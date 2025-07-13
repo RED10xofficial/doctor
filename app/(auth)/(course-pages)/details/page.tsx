@@ -5,13 +5,25 @@ import ErrorBoundary from "@/app/components/ErrorBoundary";
 import ClientWrapper from "./components/ClientWrapper";
 import SessionWrapper from "../context/SessionWrapper";
 import { Session } from "next-auth";
-import { sessionApiClient } from "@/lib/session-api-client";
+import { Exam, Section } from "@prisma/client";
+import apiClient from "@/lib/api";
+import { ErrorInjector } from "@/app/components/ErrorInjector";
 
 export const metadata: Metadata = {
   title: "Course Details - Medical Education Platform",
   description: "Access comprehensive course materials and exams",
 };
 
+export type SectionWithUnits = Section & {
+  units: {
+    id: string;
+    name: string;
+    description: string;
+    urls?: string;
+    sectionId: string;
+    exams: Exam[];
+  }[];
+};
 
 export default function DetailsPage({
   searchParams,
@@ -20,7 +32,9 @@ export default function DetailsPage({
 }) {
   return (
     <SessionWrapper>
-      {(session) => <DetailsContent session={session} searchParams={searchParams} />}
+      {(session) => (
+        <DetailsContent session={session} searchParams={searchParams} />
+      )}
     </SessionWrapper>
   );
 }
@@ -36,29 +50,32 @@ async function DetailsContent({
   const params = await searchParams;
   const currentSectionId = params.sectionId as string;
   const currentUnitId = params.unitId as string;
-
   // Fetch sections using the session-aware API client
   try {
-    const response = await sessionApiClient.getSections(session.user.examType);
+    const { data: response } = await apiClient.get(
+      `/sections?examType=${session.user.examType}`
+    );
     const data = response.success ? response.data : [];
-    
+    const { error, status } = data;
+
     return (
       <div className="bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 w-full min-h-screen">
         <div className="flex gap-4 p-4">
           <ErrorBoundary>
             <Suspense fallback={<LoadingState type="content" />}>
-              <ClientWrapper 
-                sections={data} 
+              <ClientWrapper
+                sections={data as SectionWithUnits[]}
                 initialSectionId={currentSectionId}
                 initialUnitId={currentUnitId}
               />
             </Suspense>
           </ErrorBoundary>
         </div>
+        <ErrorInjector error={error} status={status} />
       </div>
     );
   } catch (error) {
-    console.error('Error fetching sections:', error);
+    console.error("Error fetching sections:", error);
     return (
       <div className="bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 w-full min-h-screen">
         <div className="flex gap-4 p-4">

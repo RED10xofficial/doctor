@@ -2,7 +2,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import NextAuth, { Session, SessionStrategy } from "next-auth";
 import { JWT } from "next-auth/jwt";
-import { userApi, LoginResponse } from "@/lib/api-client";
+import apiClient from "@/lib/api";
 
 interface CustomSessionUser {
     id: string;
@@ -35,14 +35,16 @@ export const authOptions = {
         
         try {
           // Use the robust API client for authentication
-          const response = await userApi.loginUser({
+          const {data: response} = await apiClient.post(`/students/login`,{
             email: credentials.email,
             password: credentials.password,
           });
+
+          console.log(response, 'here')
           
           if (response.success && response.data) {
             // Attach the token to the user object
-            const data = response.data as LoginResponse;
+            const data = response.data;
             return {
               ...data.student,
               token: data.token, // if your API returns a JWT or similar
@@ -53,7 +55,8 @@ export const authOptions = {
             // Return null to indicate failed authentication
             return null;
           }
-        } catch {
+        } catch(err) {
+          console.log(err,'dfdsfdfsdfds')
           return null;
         }
       },

@@ -5,8 +5,14 @@ import dynamic from "next/dynamic";
 import AuthProvider from "../components/AuthProvider";
 import { ProfileProvider } from "../components/ProfileContext";
 import ContentWrapper from "../components/ContentWrapper";
-import { SidebarSkeleton, ProfileSkeleton } from "../(auth)/components/Skeleton";
+import {
+  SidebarSkeleton,
+  ProfileSkeleton,
+} from "../(auth)/components/Skeleton";
 import { PageTransition } from "../(auth)/components/PageTransition";
+import { ErrorProvider } from "../components/ErrorContext";
+import { ErrorSnackbar } from "../components/ErrorSnackbar";
+import { SnackbarProvider } from "../components/Snackbar";
 
 // Lazy load non-critical components
 const Sidebar = dynamic(() => import("../components/sidebar"), {
@@ -30,16 +36,20 @@ export default async function Layout({
   }
   return (
     <AuthProvider>
-      <ProfileProvider>
-        <section>
-          <Sidebar />
-          <ProfileSidebar />
-          {/* <Navigation /> */}
-          <ContentWrapper>
-            <PageTransition>{children}</PageTransition>
-          </ContentWrapper>
-        </section>
-      </ProfileProvider>
+      <SnackbarProvider>
+        <ErrorProvider>
+          <ErrorSnackbar />
+          <ProfileProvider>
+            <section>
+              <Sidebar />
+              <ProfileSidebar />
+              <ContentWrapper>
+                <PageTransition>{children}</PageTransition>
+              </ContentWrapper>
+            </section>
+          </ProfileProvider>
+        </ErrorProvider>
+      </SnackbarProvider>
     </AuthProvider>
   );
 }

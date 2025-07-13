@@ -1,11 +1,7 @@
 "use client";
 
-import { useSessionHandler } from '@/lib/use-session-handler';
-
-// Component to set up session handler with snackbar
+// Component to handle any client-side session setup if needed
 export const SessionHandlerSetup = () => {
-  useSessionHandler();
-  
-  // This component doesn't render anything, it just sets up the session handler
+  // This component doesn't render anything, it's just a placeholder for future session setup
   return null;
 }; 

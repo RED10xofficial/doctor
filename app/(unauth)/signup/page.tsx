@@ -3,7 +3,9 @@ import Image from "next/image";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import SignupForm from "@/app/components/SignupForm";
-import { getAllExamTypes } from "@/lib/utils";
+import apiClient from "@/lib/api";
+
+type ExamType = { id: string; name: string; slug: string };
 
 export const metadata: Metadata = {
   title: "Sign Up - Medical Education Platform",
@@ -19,7 +21,8 @@ export default async function SignupPage() {
     redirect("/home");
   }
 
-  const examTypes = await getAllExamTypes();
+  const {data: response} = await apiClient.get<{data: ExamType[], success: boolean}>('/examtypes');
+  const examTypes = response.success && response.data ? response.data : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative overflow-hidden">

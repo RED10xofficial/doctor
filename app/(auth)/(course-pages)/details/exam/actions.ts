@@ -1,25 +1,31 @@
 "use server";
 
+import apiClient, { ErrorResponse } from "@/lib/api";
+import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { sessionApiClient } from "@/lib/session-api-client";
 
 interface SubmitExamParams {
   studentId: string;
   examId: string;
-  answers: Record<string, {option: string, optionId: string}>
+  answers: Record<string, { option: string; optionId: string }>;
 }
 
 export async function submitExam(params: SubmitExamParams) {
   try {
-    const response = await sessionApiClient.submitExam(params);
-    
+    const session = await auth();
+    const { data: response } = await apiClient.post(
+      `/auth/exams/submit`,
+      params,
+      { headers: { token: session?.accessToken } }
+    );
+
     if (response.success) {
       revalidatePath(`/details/exam/${params.examId}`);
     } else {
-      throw new Error('Failed to submit exam');
+      throw new Error("Failed to submit exam");
     }
-  } catch (error) {
-    console.error('Error submitting exam:', error);
-    throw error;
+  } catch (err) {
+    const e = err as ErrorResponse;
+    return { ...e }
   }
-} 
+}

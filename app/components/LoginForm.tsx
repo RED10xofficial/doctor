@@ -6,14 +6,12 @@ import { useSnackbar } from "@/app/components/Snackbar";
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { signIn } from "next-auth/react";
-import { userApi } from "@/lib/api-client";
-import { getErrorMessage } from "@/lib/api-utils";
+import apiClient from "@/lib/api";
 
 type FormData = {
   email: string;
   password: string;
 };
-
 
 export default function LoginForm() {
   const { showSnackbar } = useSnackbar();
@@ -31,10 +29,12 @@ export default function LoginForm() {
     setIsLoading(true);
     try {
       // First, try to authenticate with our API to get specific error messages
-      const apiResponse = await userApi.loginUser({
+      const { data: apiResponse } = await apiClient.post("/students/login", {
         email: data.email,
         password: data.password,
       });
+
+      console.log(apiResponse);
 
       if (apiResponse.success && apiResponse.data) {
         // If API authentication succeeds, proceed with NextAuth
@@ -43,7 +43,7 @@ export default function LoginForm() {
           email: data.email,
           password: data.password,
         });
-        
+
         if (result?.ok) {
           router.push("/home");
         } else {
@@ -51,9 +51,10 @@ export default function LoginForm() {
         }
       } else {
         // Show the specific error message from the API
-        showSnackbar(getErrorMessage(apiResponse), "error");
+        showSnackbar(apiResponse.message, "error");
       }
-    } catch {
+    } catch (error) {
+      console.log(error);
       showSnackbar("Network error occurred. Please try again.", "error");
     } finally {
       setIsLoading(false);

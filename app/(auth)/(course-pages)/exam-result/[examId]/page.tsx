@@ -6,7 +6,7 @@ import LoadingState from "@/app/components/LoadingState";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import SessionWrapper from "../../context/SessionWrapper";
 import { Session } from "next-auth";
-import { sessionApiClient } from "@/lib/session-api-client";
+import apiClient from "@/lib/api";
 
 export default function ExamResultPage({
   params,
@@ -38,14 +38,20 @@ async function ExamResultContent({
   // Fetch exam result using the session-aware API client
   let data;
   try {
-    const response = await sessionApiClient.getExamResult(studentId, examId);
+    const { data: response } = await apiClient.get(
+      `/auth/students/${studentId}/result/${examId}`,
+      {
+        headers: {
+          token: session.accessToken,
+        },
+      }
+    );
     data = response.success ? response.data : null;
-    
+
     if (!data) {
       redirect("/my-exams");
     }
-  } catch (error) {
-    console.error('Error fetching exam result:', error);
+  } catch {
     redirect("/my-exams");
   }
 

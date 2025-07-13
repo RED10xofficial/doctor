@@ -2,18 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import LoadingState from '@/app/components/LoadingState';
-import { Section, Exam } from '@prisma/client';
-
-type SectionWithUnits = Section & {
-  units: {
-    id: string;
-    name: string;
-    description: string;
-    urls?: string;
-    sectionId: string;
-    exams: Pick<Exam, 'id' | 'name' | 'duration' | 'unitId' | 'instruction'>[];
-  }[];
-};
+import { SectionWithUnits } from '../page';
 
 const CourseContent = dynamic(() => import('./CourseContent'), {
   ssr: false,

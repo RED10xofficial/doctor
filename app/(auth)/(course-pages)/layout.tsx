@@ -7,6 +7,8 @@ import { redirect } from "next/navigation";
 import React from "react";
 import { Session } from "next-auth";
 import { Metadata } from "next";
+import { ErrorProvider } from "@/app/components/ErrorContext";
+import { ErrorSnackbar } from "@/app/components/ErrorSnackbar";
 
 export const metadata: Metadata = {
   title: "Course Pages",
@@ -40,12 +42,15 @@ export default async function Layout({
     <CourseLayoutProvider>
       <SessionProvider initialSession={session}>
         <SnackbarProvider>
-          <section>
-            <div className="p-4">
-              <Breadcrumb />
-            </div>
-            {childrenWithSession}
-          </section>
+          <ErrorProvider>
+            <ErrorSnackbar />
+            <section>
+              <div className="p-4">
+                <Breadcrumb />
+              </div>
+              {childrenWithSession}
+            </section>
+          </ErrorProvider>
         </SnackbarProvider>
       </SessionProvider>
     </CourseLayoutProvider>

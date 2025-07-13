@@ -8,12 +8,11 @@ import { userSchema } from "@/lib/schema/user.schema";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "@/app/components/Snackbar";
-import { userApi } from "@/lib/api-client";
-import { getErrorMessage } from "@/lib/api-utils";
+import apiClient from "@/lib/api";
 
 type FormData = z.infer<typeof userSchema>;
 
-type ExamType = { id: number; name: string, slug: string };
+type ExamType = { id: string; name: string; slug: string };
 
 interface SignupFormProps {
   examTypes: ExamType[];
@@ -44,15 +43,15 @@ export default function SignupForm({ examTypes }: SignupFormProps) {
       if (formData.confirmPassword) {
         delete formData.confirmPassword;
       }
-      
+
       // Use the robust API client for user registration
-      const response = await userApi.createUser(formData);
-      
+      const { data: response } = await apiClient.post("/students", formData);
+
       if (response.success) {
         showSnackbar("Account created successfully! Please login.", "success");
         router.push("/login");
       } else {
-        showSnackbar(getErrorMessage(response), "error");
+        showSnackbar(response.message, "error");
       }
     } catch {
       showSnackbar("Network error occurred. Please try again.", "error");

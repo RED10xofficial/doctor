@@ -1,27 +1,16 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
-import { Section, Exam } from "@prisma/client";
 import Modules from "@/app/components/modules";
 import { AlignRightIcon, BookOpenIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import VideoList from "./videoList";
+import { SectionWithUnits } from "../page";
 
 // Dynamically import heavy components
 const ExamList = dynamic(() => import("./examList"), { ssr: false });
 const Popup = dynamic(() => import("@/app/components/popup"), { ssr: false });
-
-type SectionWithUnits = Section & {
-  units: {
-    id: string;
-    name: string;
-    description: string;
-    urls?: string;
-    sectionId: string;
-    exams: Pick<Exam, "id" | "name" | "duration" | "unitId" | "instruction">[];
-  }[];
-};
 
 interface CourseContentProps {
   sections: SectionWithUnits[];

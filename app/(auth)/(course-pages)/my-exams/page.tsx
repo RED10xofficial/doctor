@@ -3,8 +3,9 @@ import { Session } from "next-auth";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
-import { sessionApiClient } from "@/lib/session-api-client";
-import { getErrorMessage } from "@/lib/api-utils";
+import apiClient, { ErrorResponse } from "@/lib/api";
+import { auth } from "@/lib/auth";
+import { ErrorInjector } from "@/app/components/ErrorInjector";
 
 // Dynamically import the client wrapper with loading state
 const ClientWrapper = dynamic(() => import("./components/ClientWrapper"), {
@@ -51,18 +52,25 @@ type ExamData = {
   totalMarks: number;
 };
 
-async function getAttendedExams(studentId: string): Promise<ExamData[]> {
+async function getAttendedExams(studentId: string) {
   try {
-    const response = await sessionApiClient.getUserExams(studentId);
+    const session = await auth();
+    const { data: response } = await apiClient.get(
+      `/auth/students/${studentId}/exams`,
+      {
+        headers: {
+          token: session?.accessToken,
+        },
+      }
+    );
     if (response.success) {
       return Array.isArray(response.data) ? response.data : [];
     } else {
-      console.error('Failed to fetch user exams:', getErrorMessage(response));
-      return [];
+      return { error: response.error, status: response.status };
     }
-  } catch (error) {
-    console.error("Error fetching user exams:", error);
-    return [];
+  } catch (err) {
+    const e = err as ErrorResponse;
+    return { ...e };
   }
 }
 
@@ -76,7 +84,8 @@ export default function MyExamsPage() {
 
 async function MyExamsContent({ session }: { session: Session }) {
   const attendedExams = await getAttendedExams(session?.user?.id as string);
-  if (attendedExams.length === 0) {
+  const { error, status } = attendedExams;
+  if (Array.isArray(attendedExams) && attendedExams?.length === 0) {
     return (
       <div className="flex-1 relative bg-gradient-to-r from-sky-100/50 to-pink-100/50 via-gray-50 rounded-lg p-4 pt-2 min-h-[calc(100vh-6rem)]">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -90,8 +99,9 @@ async function MyExamsContent({ session }: { session: Session }) {
       <div className="p-4 space-y-6">
         <ErrorBoundary>
           <Suspense fallback={<div className="animate-pulse">Loading...</div>}>
-            <ClientWrapper exams={attendedExams} />
+            <ClientWrapper exams={attendedExams as ExamData[]} />
           </Suspense>
+          <ErrorInjector error={error} status={status} />
         </ErrorBoundary>
       </div>
     </div>

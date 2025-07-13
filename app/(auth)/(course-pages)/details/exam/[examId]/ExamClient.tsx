@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Timer } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Popup from "@/app/components/popup";
 import ExamInstructions from "../../components/examInstructions";
 import { useSnackbar } from "@/app/components/Snackbar";
@@ -101,7 +101,7 @@ export default function ExamClient({ exam, userId }: ExamClientProps) {
         }
       );
       showSnackbar("Your answers have been submitted", "success");
-      // router.push(`/exam-result/${exam.id}`);
+      redirect(`/exam-result/${exam.id}`);
     } catch {
       showSnackbar("Failed to submit exam", "error");
     }

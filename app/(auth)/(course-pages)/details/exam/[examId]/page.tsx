@@ -5,33 +5,41 @@ import ErrorBoundary from "@/app/components/ErrorBoundary";
 import SessionWrapper from "../../../context/SessionWrapper";
 import ExamAttemptedMessage from "@/app/components/ExamAttemptedMessage";
 import { Session } from "next-auth";
-import { sessionApiClient } from "@/lib/session-api-client";
+import apiClient, { ErrorResponse } from "@/lib/api";
+import { ErrorInjector } from "@/app/components/ErrorInjector";
+import { auth } from "@/lib/auth";
 
 async function checkExamAttempt(examId: string, studentId: string) {
   try {
-    const response = await sessionApiClient.getExamResult(studentId, examId);
+    const session = await auth();
+    const { data: response } = await apiClient.get(
+      `/students/${studentId}/exams/${examId}`,
+      {
+        headers: {
+          token: session?.accessToken,
+        },
+      }
+    );
     if (response.success && response.data) {
-      throw new Error('You have already attempted this exam.');
+      throw new Error("You have already attempted this exam.");
     }
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('already attempted')) {
-      throw error;
-    }
-    // If it's not an "already attempted" error, we can proceed with the exam
+  } catch (err) {
+    const e = err as ErrorResponse;
+    return {...e}
   }
 }
 
 async function getExamData(examId: string) {
   try {
-    const response = await sessionApiClient.getExam(examId);
+    const { data: response } = await apiClient.get(`/questions/${examId}`);
     if (response.success && response.data) {
       return response.data;
     } else {
-      throw new Error("Exam not found");
+      return { error: response.message, status: response.status };
     }
-  } catch (error) {
-    console.error('Error fetching exam data:', error);
-    throw new Error("Exam not found");
+  } catch (err) {
+    const e = err as ErrorResponse;
+    return { ...e };
   }
 }
 
@@ -55,15 +63,31 @@ export default async function ExamPage({
   );
 }
 
-async function ExamContent({ examId, userId }: { examId: string; userId: string }) {
+async function ExamContent({
+  examId,
+  userId,
+}: {
+  examId: string;
+  userId: string;
+}) {
   try {
     await checkExamAttempt(examId, userId);
     const exam = await getExamData(examId);
-    return <ExamClient exam={exam} userId={userId}/>;
+    const { error, status } = exam;
+    return (
+      <>
+        <ExamClient exam={exam} userId={userId} />;
+        <ErrorInjector error={error} status={status} />
+      </>
+    );
   } catch (error) {
     return (
-      <ExamAttemptedMessage 
-        message={error instanceof Error ? error.message : 'You have already attempted this exam.'} 
+      <ExamAttemptedMessage
+        message={
+          error instanceof Error
+            ? error.message
+            : "You have already attempted this exam."
+        }
       />
     );
   }
