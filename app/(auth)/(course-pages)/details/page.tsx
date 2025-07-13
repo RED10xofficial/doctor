@@ -13,16 +13,6 @@ export const metadata: Metadata = {
   description: "Access comprehensive course materials and exams",
 };
 
-type SectionWithUnits = Section & {
-  units: {
-    id: string;
-    name: string;
-    description: string;
-    urls?: string;
-    sectionId: string;
-    exams: Pick<Exam, 'id' | 'name' | 'duration' | 'unitId' | 'instruction'>[];
-  }[];
-};
 
 export default function DetailsPage({
   searchParams,
