@@ -3,7 +3,8 @@ import { Session } from "next-auth";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
-import apiClient, { ErrorResponse } from "@/lib/api";
+import { examApi } from "@/lib/api-client";
+import { handleApiError } from "@/lib/api-utils";
 import { auth } from "@/lib/auth";
 import { ErrorInjector } from "@/app/components/ErrorInjector";
 
@@ -55,22 +56,19 @@ type ExamData = {
 async function getAttendedExams(studentId: string) {
   try {
     const session = await auth();
-    const { data: response } = await apiClient.get(
-      `/auth/students/${studentId}/exams`,
-      {
-        headers: {
-          token: session?.accessToken,
-        },
-      }
+    const { data: response } = await examApi.getUserExams(
+      studentId, 
+      session?.accessToken as string
     );
+    
     if (response.success) {
       return Array.isArray(response.data) ? response.data : [];
     } else {
-      return { error: response.error, status: response.status };
+      return { error: response.message, status: response.status };
     }
   } catch (err) {
-    const e = err as ErrorResponse;
-    return { ...e };
+    const apiError = handleApiError(err);
+    return { error: apiError.message, status: apiError.status };
   }
 }
 

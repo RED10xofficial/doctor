@@ -9,7 +9,8 @@ import {
   PopularUnitsSkeleton,
 } from "../components/Skeleton";
 import { ErrorInjector } from "@/app/components/ErrorInjector";
-import apiClient, { ErrorResponse } from "@/lib/api";
+import { unitApi, statsApi } from "@/lib/api-client";
+import { safeApiCall, handleApiError } from "@/lib/api-utils";
 
 const HeroSection = dynamic(() => import("./components/HeroSection"), {
   ssr: true,
@@ -34,40 +35,18 @@ export default async function Home() {
 
   const examType = session.user.examType;
 
-  let popularUnits = [];
-  let units = 0;
-  let sections = 0;
-  let exams = 0;
+  // Use safe API calls with fallbacks
+  const popularUnits = await safeApiCall(
+    () => unitApi.getPopularUnits(examType, 5),
+    []
+  );
 
-  try {
-    const { data: response } = await apiClient.get(
-      `/units?examType=${examType}&limit=5`
-    );
-    popularUnits =
-      response.success && Array.isArray(response.data) ? response.data : [];
-    if (!response.success) {
-      error = response.message as string;
-      status = response.status;
-    }
-  } catch (err) {
-    const e = err as ErrorResponse;
-    error = e.message;
-    status = e.status;
-  }
+  const stats = await safeApiCall(
+    () => statsApi.getStats(examType),
+    { sections: 0, units: 0, exams: 0 }
+  );
 
-  try {
-    const { data: response } = await apiClient.get(`/stats/${examType}`);
-    const data = response.success
-      ? response.data
-      : { sections: 0, units: 0, exams: 0 };
-    units = data.units;
-    sections = data.sections;
-    exams = data.exams;
-  } catch (err) {
-    const e = err as ErrorResponse;
-    error = e.message;
-    status = e.status;
-  }
+  const { units, sections, exams } = stats;
 
   return (
     <div className="flex flex-col items-center p-5 gap-6">
